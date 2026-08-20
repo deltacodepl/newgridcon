@@ -7,7 +7,7 @@
 <meta name="description" content="Przyłącze energetyczne, założenie licznika, aktywacja dostawy prądu, zmiana dostawcy i przepisanie licznika — jedna ścieżka, jeden opiekun, od wniosku do włączonego prądu.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 
 /* ============ TOKENS ============ */
@@ -121,35 +121,120 @@ button{font-family:inherit;}
 }
 
 /* ============ HERO ============ */
-.hero{padding:72px 0 56px;}
-.hero .grid{align-items:center;}
-.hero-copy{grid-column:1 / 7;}
-.hero-visual{grid-column:8 / 13;}
-.hero-eyebrow{margin-bottom:20px;}
+.hero{
+  --hero-green:#0c3c2e;
+  --hero-lavender:#e9b4e6;
+  --hero-lime:#1ee677;
+  --hero-ink:#073d2e;
+  position:relative;
+  height:clamp(300px, calc(100vh - 72px - 280px), 420px);
+  min-height:300px;
+  padding:28px 0;
+  overflow:hidden;
+  background:var(--hero-green);
+  color:#fff;
+  font-family:'Montserrat',sans-serif;
+}
+.hero .container{position:relative;z-index:2;height:100%;}
+.hero .grid{align-items:center;height:100%;}
+.hero-copy{grid-column:1 / 7;max-width:36rem;}
+.hero-visual{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  overflow:hidden;
+  pointer-events:none;
+}
+.hero-visual img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:72% 48%;
+}
+.hero-shade{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:var(--hero-green);
+  clip-path:polygon(0 0, 62% 0, 46% 100%, 0 100%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-family:'Montserrat',sans-serif;
+  font-size:15px;
+  font-weight:500;
+  letter-spacing:0.01em;
+  text-transform:none;
+  color:#fff;
+  margin-bottom:10px;
+}
 .hero h1{
-  font-size:clamp(38px,5.2vw,64px);
-  line-height:1.03;
-  margin-bottom:24px;
+  font-family:'Montserrat',sans-serif;
+  font-weight:800;
+  font-size:clamp(22px,2.6vw,36px);
+  line-height:1.12;
+  letter-spacing:-0.02em;
+  text-transform:uppercase;
+  margin-bottom:12px;
+  color:var(--hero-lavender);
 }
 .hero h1 em{
-  font-style:normal;color:var(--red);
+  font-style:normal;color:var(--hero-lavender);
 }
 .hero-sub{
-  font-size:18px;line-height:1.55;color:var(--ink-soft);max-width:46ch;margin-bottom:32px;
+  font-family:'Montserrat',sans-serif;
+  font-size:15px;
+  font-weight:400;
+  line-height:1.45;
+  color:#fff;
+  max-width:46ch;
+  margin-bottom:18px;
 }
-.hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:40px;}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0;}
+.hero .btn{
+  font-family:'Montserrat',sans-serif;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:0;
+  text-transform:none;
+  border-radius:999px;
+  padding:12px 26px;
+  min-height:44px;
+}
+.hero .btn--primary{background:var(--hero-lime);color:var(--hero-ink);border-color:var(--hero-lime);}
+.hero .btn--primary:hover{background:#42e28f;border-color:#42e28f;}
+.hero .btn--ghost{color:#fff;border-color:rgba(255,255,255,.7);background:transparent;}
+.hero .btn--ghost:hover{background:#fff;color:var(--hero-green);}
 
-.situation-label{
-  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--ink-faint);margin-bottom:12px;
+@media (max-width:900px){
+  .hero{
+    display:flex;
+    flex-direction:column;
+    height:auto;
+    min-height:0;
+    padding:36px 0 0;
+  }
+  .hero .container,.hero .grid{height:auto;}
+  .hero .container{order:1;}
+  .hero-copy{grid-column:1 / -1;}
+  .hero-shade{display:none;}
+  .hero-visual{
+    position:relative;
+    inset:auto;
+    order:2;
+    width:100%;
+    height:200px;
+    margin:28px 0 0;
+  }
+  .hero-visual img{object-position:center 40%;}
 }
-.chips{display:flex;flex-wrap:wrap;gap:10px;}
-.chip{
-  font-family:var(--mono);font-size:12.5px;font-weight:500;letter-spacing:0.02em;
-  padding:10px 14px;border:1px solid var(--line);text-decoration:none;color:var(--ink-soft);
-  transition:border-color .15s ease,color .15s ease,background-color .15s ease;
+
+@media (max-height:820px) and (min-width:901px){
+  .hero{height:min(360px, calc(100vh - 72px - 240px));padding:20px 0;}
+  .hero h1{font-size:clamp(20px,2.2vw,30px);}
+  .hero-sub{font-size:14px;margin-bottom:14px;}
 }
-.chip:hover{border-color:var(--red);color:var(--red);background:var(--red-dim);}
 
 /* hero schematic diagram */
 .schema{width:100%;height:auto;}
@@ -173,7 +258,7 @@ button{font-family:inherit;}
 }
 
 /* trust strip */
-.trust{padding:28px 0;}
+.trust{padding:16px 0;}
 .trust .grid{align-items:center;}
 .trust-item{
   grid-column:span 4;
@@ -189,6 +274,7 @@ button{font-family:inherit;}
 /* ============ SECTION SHELL ============ */
 /* numbered section w/ sticky rail */
 .numbered{padding:96px 0;}
+#sytuacja.numbered{padding-top:40px;padding-bottom:72px;}
 .numbered-inner{display:flex;gap:48px;align-items:flex-start;}
 .rail{
   width:var(--rail-w);flex-shrink:0;
@@ -429,40 +515,20 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
 
   <!-- ============ HERO ============ -->
   <section class="hero">
+    <div class="hero-visual">
+      <img src="images/baner-kup-prad-online-.webp" alt="Rodzina korzystająca z energii w domu">
+    </div>
+    <div class="hero-shade" aria-hidden="true"></div>
     <div class="container grid">
       <div class="hero-copy">
         <p class="eyebrow hero-eyebrow">Przyłącza · liczniki · aktywacja prądu</p>
-        <h1>Prąd w Twoim domu <em>krok po kroku</em> — od wniosku do aktywnego licznika.</h1>
-        <p class="hero-sub">Zajmujemy się przyłączem energetycznym, założeniem licznika i całą dokumentacją u Twojego dystrybutora. Ty odbierasz telefon w sprawie terminu montażu — resztą formalności zajmuje się jeden opiekun.</p>
+        <h1>Prąd w Twoim domu <br/> <em>krok po kroku</em>
+          <br/> - od wniosku do aktywnego licznika.</h1>
+        <p class="hero-sub">Pomagamy w procesie przyłączenia prądu, wyjaśniamy całą procedurę i wspieramy Cię na każdym etapie.</p>
         <div class="hero-actions">
           <a href="#zgloszenie" class="btn btn--primary">Opisz swoją sytuację</a>
           <a href="#proces" class="btn btn--ghost">Zobacz, jak to działa</a>
         </div>
-        <p class="situation-label">Zacznij od tego, co Cię dotyczy</p>
-        <div class="chips">
-          <a href="#sytuacja" class="chip">Buduję dom</a>
-          <a href="#sytuacja" class="chip">Kupuję nieruchomość</a>
-          <a href="#sytuacja" class="chip">Zmieniam dostawcę</a>
-          <a href="#sytuacja" class="chip">Wznawiam dostawę prądu</a>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <svg class="schema" viewBox="0 0 400 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schemat drogi od działki do włączonego licznika prądu">
-          <path class="schema-line" d="M20,150 L120,150 L120,60 L230,60 L230,150 L340,150"/>
-          <circle class="schema-pulse" r="4" cx="20" cy="150"/>
-
-          <circle class="schema-node-circle" cx="20" cy="150" r="7"/>
-          <text class="schema-label" x="0" y="176">DZIAŁKA</text>
-
-          <circle class="schema-node-circle" cx="120" cy="60" r="7"/>
-          <text class="schema-label" x="90" y="42">PRZYŁĄCZE</text>
-
-          <circle class="schema-node-circle schema-node-circle--active" cx="230" cy="60" r="8"/>
-          <text class="schema-label schema-label--active" x="205" y="42">LICZNIK</text>
-
-          <circle class="schema-node-circle" cx="340" cy="150" r="7"/>
-          <text class="schema-label" x="300" y="176">DYSTRYBUTOR</text>
-        </svg>
       </div>
     </div>
   </section>
