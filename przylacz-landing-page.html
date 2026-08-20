@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRZYŁĄCZ. — Podłączenie prądu, licznik, przepisanie i zmiana dostawcy</title>
+<meta name="description" content="Planujesz podłączenie prądu do działki, domu lub mieszkania? Sprawdź, jak złożyć wniosek o przyłącze energetyczne, ile kosztuje przyłączenie prądu oraz jak przebiega montaż i założenie licznika energii.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --paper: #F1F0EA;
+    --paper-raised: #FBFAF8;
+    --ink: #14181F;
+    --ink-soft: #565B63;
+    --ink-faint: #8A8E93;
+    --line: #D9D6C9;
+    --line-strong: #C7C3B4;
+    --copper: #C4501A;
+    --copper-strong: #A8420E;
+    --copper-tint: rgba(196,80,26,0.10);
+    --circuit-blue: #1C4863;
+    --signal-green: #2E7D4F;
+    --hazard: #C68A1F;
+
+    --display: "Archivo", sans-serif;
+    --body: "IBM Plex Sans", sans-serif;
+    --mono: "IBM Plex Mono", monospace;
+
+    --maxw: 1180px;
+    --charge: 0;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{
+    font-family:var(--display);
+    font-weight:800;
+    line-height:1.04;
+    letter-spacing:-0.01em;
+    margin:0;
+    color:var(--ink);
+  }
+
+  p{ margin:0; }
+  a{ color:inherit; text-decoration:none; }
+  ul{ margin:0; padding:0; list-style:none; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  ::selection{ background:var(--copper); color:var(--paper-raised); }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible{
+    outline:2.5px solid var(--copper-strong);
+    outline-offset:3px;
+  }
+
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px; }
+  @media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--copper-strong);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1.5px;
+    background:var(--copper-strong);
+    display:inline-block;
+  }
+
+  .section{ position:relative; padding:100px 0; border-bottom:1px solid var(--line); }
+  .section--tight{ padding:76px 0; }
+  @media (max-width:780px){
+    .section{ padding:68px 0; }
+    .section--tight{ padding:52px 0; }
+  }
+  .section--dark{ background:var(--ink); border-bottom-color:#262B33; }
+  .section--raised{ background:var(--paper-raised); }
+
+  .section-head{ max-width:760px; margin-bottom:52px; }
+  .section-head h2{ font-size:clamp(28px,3.6vw,44px); }
+  .section-head .dek{ margin-top:18px; font-size:18px; color:var(--ink-soft); max-width:620px; }
+  .section--dark .section-head h2{ color:var(--paper); }
+  .section--dark .section-head .dek{ color:#A9AEB4; }
+
+  /* ============ TOP PROGRESS BAR ============ */
+  .charge-bar{
+    position:fixed; top:0; left:0; right:0; height:3px;
+    background:transparent; z-index:200;
+  }
+  .charge-bar__fill{
+    height:100%;
+    width:calc(var(--charge) * 1%);
+    background:var(--copper);
+    transition:width 0.08s linear;
+  }
+
+  /* ============ NAV ============ */
+  .nav{
+    position:sticky; top:3px; z-index:150;
+    background:rgba(241,240,234,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav__row{
+    display:flex; align-items:center; justify-content:space-between;
+    height:76px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand__mark{ flex:none; }
+  .brand__word{
+    font-family:var(--mono); font-weight:600; font-size:17px;
+    letter-spacing:0.02em;
+  }
+  .brand__word b{ color:var(--copper-strong); font-weight:600; }
+
+  .nav__links{ display:flex; align-items:center; gap:34px; }
+  .nav__links a{
+    font-family:var(--mono); font-size:13px; letter-spacing:0.03em;
+    color:var(--ink-soft); text-transform:uppercase;
+    padding:6px 0; border-bottom:1px solid transparent;
+  }
+  .nav__links a:hover{ color:var(--ink); border-bottom-color:var(--copper); }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--mono); font-size:13.5px; font-weight:600;
+    letter-spacing:0.03em; text-transform:uppercase;
+    padding:13px 22px; border-radius:2px;
+    border:1.5px solid var(--ink);
+    background:transparent; color:var(--ink);
+    transition:background 0.15s ease, color 0.15s ease, border-color .15s ease, transform .1s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn--primary{
+    background:var(--copper-strong); border-color:var(--copper-strong); color:var(--paper-raised);
+  }
+  .btn--primary:hover{ background:var(--ink); border-color:var(--ink); }
+  .btn--ghost-dark{ border-color:#4A5058; color:var(--paper); }
+  .btn--ghost-dark:hover{ background:var(--paper); color:var(--ink); }
+  .btn--nav{ padding:10px 18px; font-size:12.5px; }
+
+  .nav__toggle{ display:none; background:none; border:1.5px solid var(--ink); padding:9px 12px; }
+  .nav__toggle span{ display:block; width:18px; height:1.6px; background:var(--ink); margin:3.5px 0; }
+
+  @media (max-width:900px){
+    .nav__links{
+      position:absolute; top:76px; left:0; right:0;
+      background:var(--paper-raised); border-bottom:1px solid var(--line);
+      flex-direction:column; align-items:flex-start; gap:0;
+      padding:6px 20px 18px; display:none;
+    }
+    .nav__links.is-open{ display:flex; }
+    .nav__links a{ width:100%; padding:12px 0; border-bottom:1px solid var(--line); }
+    .nav__toggle{ display:inline-flex; flex-direction:column; justify-content:center; }
+    .nav__cta{ display:none; }
+  }
+
+  /* ============ SIDE CIRCUIT RAIL (desktop signature element) ============ */
+  .rail{
+    position:fixed; left:26px; top:96px; bottom:26px; width:26px;
+    z-index:10; display:flex; justify-content:center;
+  }
+  .rail__line{
+    position:relative; width:2px; height:100%;
+    background:var(--line-strong);
+  }
+  .rail__line::after{
+    content:""; position:absolute; left:0; top:0; width:100%;
+    height:calc(var(--charge) * 1%);
+    background:var(--copper);
+    transition:height 0.12s linear;
+  }
+  .rail__node{
+    position:absolute; left:50%; transform:translate(-50%,-50%);
+    width:11px; height:11px; border-radius:50%;
+    background:var(--paper); border:2px solid var(--ink-faint);
+    transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .rail__node.is-live{
+    border-color:var(--copper); background:var(--copper);
+    box-shadow:0 0 0 4px var(--copper-tint);
+  }
+  @media (max-width:1180px){ .rail{ display:none; } }
+
+  /* ============ HERO ============ */
+  .hero{
+    position:relative; padding:88px 0 76px; overflow:hidden;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 119px, var(--line) 119px 120px);
+  }
+  .hero .wrap{ position:relative; }
+  .hero__grid{ display:grid; grid-template-columns:1fr; gap:34px; max-width:900px; }
+  .hero h1{ font-size:clamp(38px,5.6vw,68px); }
+  .hero h1 em{ font-style:normal; color:var(--copper-strong); }
+  .hero__dek{
+    font-size:19px; color:var(--ink-soft); max-width:640px; margin-top:8px;
+  }
+  .hero__ctas{ display:flex; gap:16px; margin-top:8px; flex-wrap:wrap; }
+
+  .hero__meta{
+    margin-top:56px; display:flex; align-items:center; gap:14px;
+    font-family:var(--mono); font-size:12.5px; color:var(--ink-faint);
+    letter-spacing:0.03em; text-transform:uppercase;
+  }
+  .hero__meta .dot{ width:7px; height:7px; border-radius:50%; background:var(--signal-green); }
+
+  /* trust strip */
+  .trust{ border-top:1px solid var(--line); margin-top:64px; padding-top:28px; }
+  .trust__label{ font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:16px; }
+  .trust__row{ display:flex; flex-wrap:wrap; gap:0; }
+  .trust__item{
+    font-family:var(--mono); font-weight:600; font-size:15px; letter-spacing:0.02em;
+    padding:8px 22px 8px 0; margin-right:22px; border-right:1px solid var(--line);
+  }
+  .trust__item:last-child{ border-right:none; }
+
+  /* ============ STATS BAND ============ */
+  .stats{ background:var(--ink); border-bottom:1px solid #262B33; }
+  .stats__row{ display:grid; grid-template-columns:repeat(3,1fr); gap:40px; padding:56px 0; }
+  .stat__num{ font-family:var(--display); font-weight:900; font-size:clamp(40px,5vw,58px); color:var(--copper); line-height:1; }
+  .stat__label{ font-family:var(--body); font-size:15px; color:#B7BBC0; margin-top:12px; max-width:280px; }
+  @media (max-width:780px){ .stats__row{ grid-template-columns:1fr; gap:30px; padding:44px 0; } }
+
+  /* ============ SITUATION CARDS ============ */
+  .sit-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  @media (max-width:780px){ .sit-grid{ grid-template-columns:1fr; } }
+  .sit-card{
+    background:var(--paper-raised); padding:38px 34px; display:flex; flex-direction:column;
+    transition:background .15s ease;
+  }
+  .sit-card:hover{ background:#FFFFFF; }
+  .sit-card__top{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; }
+  .sit-card__num{ font-family:var(--mono); font-weight:600; font-size:14px; color:var(--copper-strong); }
+  .sit-card__arrow{ font-size:18px; color:var(--ink-faint); transition:transform .15s ease, color .15s ease; }
+  .sit-card:hover .sit-card__arrow{ transform:translateX(4px); color:var(--copper-strong); }
+  .sit-card h3{ font-family:var(--display); font-weight:800; font-size:21px; margin-bottom:12px; line-height:1.15; }
+  .sit-card p{ color:var(--ink-soft); font-size:15px; }
+  .sit-card__note{
+    margin-top:18px; padding-top:16px; border-top:1px dashed var(--line-strong);
+    font-size:13.5px; color:var(--circuit-blue); font-family:var(--mono);
+  }
+
+  /* ============ PROCESS STEPS (numbered, connected) ============ */
+  .steps{ display:flex; flex-direction:column; }
+  .step{
+    display:grid; grid-template-columns:64px 1fr; gap:24px;
+    padding:26px 0; border-top:1px solid var(--line);
+    position:relative;
+  }
+  .step:last-child{ border-bottom:1px solid var(--line); }
+  .step__num{
+    font-family:var(--mono); font-weight:600; font-size:15px; color:var(--copper-strong);
+    display:flex; align-items:flex-start; padding-top:2px;
+  }
+  .step__body h3{ font-family:var(--display); font-weight:700; font-size:18px; margin-bottom:6px; }
+  .step__body p{ color:var(--ink-soft); font-size:15px; max-width:640px; }
+  .step__tag{
+    display:inline-block; margin-top:10px; font-family:var(--mono); font-size:11.5px;
+    color:var(--circuit-blue); background:#1C48630F; border:1px solid #1C48631F;
+    padding:3px 8px; letter-spacing:0.04em; text-transform:uppercase;
+  }
+
+  .two-col{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:72px; align-items:start; }
+  @media (max-width:900px){ .two-col{ grid-template-columns:1fr; gap:40px; } }
+
+  /* schematic diagram (przyłącze) */
+  .schema{
+    background:var(--paper-raised); border:1px solid var(--line); padding:30px 26px;
+  }
+  .schema__title{ font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:22px; }
+  .schema__row{ display:flex; align-items:center; }
+  .schema__node{
+    flex:none; width:38px; height:38px; border-radius:50%; border:2px solid var(--circuit-blue);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:12px; font-weight:600; color:var(--circuit-blue);
+    background:var(--paper-raised);
+  }
+  .schema__node--live{ border-color:var(--copper); color:var(--copper-strong); }
+  .schema__wire{ flex:1; height:2px; background:repeating-linear-gradient(90deg, var(--circuit-blue) 0 6px, transparent 6px 11px); min-width:16px; }
+  .schema__labels{ display:flex; margin-top:10px; }
+  .schema__labels span{ flex:none; width:38px; text-align:center; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); }
+  .schema__labels .sp{ flex:1; min-width:16px; }
+  .schema__caption{ margin-top:20px; font-size:14px; color:var(--ink-soft); }
+
+  /* ============ COST GRID ============ */
+  .cost-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:44px; }
+  @media (max-width:780px){ .cost-grid{ grid-template-columns:1fr; } }
+  .cost-cell{ background:var(--paper-raised); padding:28px; }
+  .cost-cell__label{ font-family:var(--mono); font-size:12px; color:var(--copper-strong); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:10px; }
+  .cost-cell p{ font-size:15px; color:var(--ink-soft); }
+
+  .range-panel{
+    background:var(--ink); color:var(--paper); padding:36px 34px; display:flex; align-items:center; gap:36px; flex-wrap:wrap;
+  }
+  .range-panel__num{ font-family:var(--display); font-weight:900; font-size:clamp(30px,3.4vw,42px); color:var(--copper); white-space:nowrap; }
+  .range-panel__text{ font-size:15px; color:#B7BBC0; max-width:520px; }
+  .range-panel__text b{ color:var(--paper); }
+
+  /* ============ DISTRIBUTORS ============ */
+  .osd-row{ display:flex; flex-wrap:wrap; gap:12px; margin-bottom:6px; }
+  .osd-btn{
+    font-family:var(--mono); font-size:13.5px; font-weight:600; letter-spacing:0.03em;
+    padding:12px 20px; border:1.5px solid var(--line-strong); background:var(--paper-raised); color:var(--ink);
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .osd-btn:hover, .osd-btn.is-active{ border-color:var(--copper-strong); color:var(--copper-strong); }
+  .osd-tip{
+    margin-top:22px; padding:20px 22px; background:var(--paper-raised); border-left:3px solid var(--copper-strong);
+    font-size:15px; color:var(--ink-soft); display:none;
+  }
+  .osd-tip.is-visible{ display:block; }
+  .osd-tip b{ color:var(--ink); }
+
+  /* ============ FAQ ============ */
+  .faq{ border-top:1px solid var(--line); }
+  .faq-item{ border-bottom:1px solid var(--line); }
+  .faq-item summary{
+    list-style:none; cursor:pointer; padding:24px 0; display:flex; align-items:center; justify-content:space-between; gap:24px;
+    font-family:var(--display); font-weight:700; font-size:18px;
+  }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary .plus{ font-family:var(--mono); font-size:20px; color:var(--copper-strong); flex:none; transition:transform .18s ease; }
+  .faq-item[open] summary .plus{ transform:rotate(45deg); }
+  .faq-item__body{ padding:0 0 26px; max-width:700px; font-size:15.5px; color:var(--ink-soft); }
+
+  /* ============ FORM ============ */
+  .form-panel{
+    background:var(--paper-raised); border:1px solid var(--line);
+    padding:46px 44px; max-width:640px;
+  }
+  @media (max-width:640px){ .form-panel{ padding:32px 24px; } }
+  .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+  @media (max-width:560px){ .form-row{ grid-template-columns:1fr; } }
+  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field label{ font-family:var(--mono); font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-soft); }
+  .field input[type="text"], .field input[type="tel"], .field input[type="email"], .field input[type="date"]{
+    border:1.5px solid var(--line-strong); background:var(--paper); padding:13px 14px;
+    font-family:var(--body); font-size:15px; color:var(--ink); border-radius:2px;
+  }
+  .field input:focus{ border-color:var(--copper-strong); }
+  .field--check{ flex-direction:row; align-items:flex-start; gap:11px; }
+  .field--check input{ margin-top:3px; width:16px; height:16px; accent-color:var(--copper-strong); flex:none; }
+  .field--check label{ font-family:var(--body); font-size:14px; text-transform:none; letter-spacing:0; color:var(--ink-soft); line-height:1.5; }
+  .form-submit{ margin-top:8px; width:100%; justify-content:center; padding:16px; font-size:14px; }
+  .form-note{ margin-top:18px; font-size:13px; color:var(--ink-faint); }
+  .form-success{ display:none; }
+  .form-success.is-visible{ display:block; }
+  .form-success h3{ font-family:var(--display); font-size:20px; margin-bottom:10px; }
+  .form-success p{ color:var(--ink-soft); font-size:15px; }
+
+  .kontakt-close{
+    margin-top:28px; display:flex; align-items:center; gap:14px;
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft);
+  }
+  .kontakt-close .dot{ width:8px; height:8px; border-radius:50%; background:var(--hazard); flex:none; }
+
+  /* ============ FOOTER ============ */
+  footer{ background:var(--ink); color:#9BA0A6; padding:64px 0 32px; }
+  .foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:40px; padding-bottom:44px; border-bottom:1px solid #262B33; }
+  @media (max-width:780px){ .foot-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:480px){ .foot-grid{ grid-template-columns:1fr; } }
+  .foot-col h4{ font-family:var(--mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#6A6F76; margin-bottom:16px; }
+  .foot-col a, .foot-col p{ display:block; font-size:14.5px; color:#B7BBC0; margin-bottom:10px; }
+  .foot-col a:hover{ color:var(--copper); }
+  .foot-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:26px; flex-wrap:wrap; gap:12px; }
+  .foot-bottom p{ font-family:var(--mono); font-size:12px; color:#6A6F76; }
+
+  .u-mono{ font-family:var(--mono); }
+</style>
+</head>
+<body>
+
+<div class="charge-bar"><div class="charge-bar__fill" id="chargeFill"></div></div>
+
+<div class="rail" id="rail" aria-hidden="true">
+  <div class="rail__line"></div>
+</div>
+
+<nav class="nav">
+  <div class="wrap nav__row">
+    <a href="#top" class="brand">
+      <svg class="brand__mark" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="4" cy="12" r="3" fill="#A8420E"/>
+        <line x1="7" y1="12" x2="17" y2="12" stroke="#A8420E" stroke-width="2"/>
+        <circle cx="20" cy="12" r="3" stroke="#A8420E" stroke-width="2"/>
+      </svg>
+      <span class="brand__word"><b>PRZYŁĄCZ</b>.</span>
+    </a>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="#sytuacja">Sytuacja</a></li>
+      <li><a href="#przylacze">Przyłącze</a></li>
+      <li><a href="#koszty">Koszty</a></li>
+      <li><a href="#licznik">Licznik</a></li>
+      <li><a href="#przepisanie">Przepisanie</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="#kontakt" class="btn btn--primary btn--nav nav__cta">Zgłoś się</a>
+      <button class="nav__toggle" id="navToggle" aria-label="Otwórz menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="wrap">
+      <div class="hero__grid">
+        <div class="eyebrow">Przyłącza · liczniki · aktywacja · przepisanie</div>
+        <h1>Prąd w Twoim domu.<br>Zaplanowany, <em>nie zgadywany</em>.</h1>
+        <p class="hero__dek">Planujesz podłączenie prądu do działki, domu lub mieszkania? Sprawdź, jak złożyć wniosek o przyłącze energetyczne, ile kosztuje przyłączenie prądu oraz jak przebiega montaż i założenie licznika energii.</p>
+        <div class="hero__ctas">
+          <a href="#sytuacja" class="btn btn--primary">Sprawdź swoją sytuację</a>
+          <a href="#proces" class="btn">Zobacz, jak to działa</a>
+        </div>
+        <div class="hero__meta">
+          <span class="dot"></span>
+          <span>Jedno zgłoszenie · dobieramy właściwą ścieżkę · prowadzimy do końca</span>
+        </div>
+      </div>
+
+      <div class="trust">
+        <div class="trust__label">Sprawy prowadzimy niezależnie od operatora sieci (OSD)</div>
+        <div class="trust__row">
+          <span class="trust__item u-mono">ENEA</span>
+          <span class="trust__item u-mono">ENERGA</span>
+          <span class="trust__item u-mono">TAURON</span>
+          <span class="trust__item u-mono">PGE</span>
+          <span class="trust__item u-mono">STOEN</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ STATS BAND ============ -->
+  <section class="stats" data-rail-skip>
+    <div class="wrap stats__row">
+      <div>
+        <div class="stat__num">5</div>
+        <div class="stat__label">operatorów sieci (OSD), z którymi formalności prowadzimy tą samą, jasną ścieżką.</div>
+      </div>
+      <div>
+        <div class="stat__num">3</div>
+        <div class="stat__label">etapy dzielą Ciebie od aktywnego licznika: wniosek, montaż, aktywacja.</div>
+      </div>
+      <div>
+        <div class="stat__num">1</div>
+        <div class="stat__label">zgłoszenie z Twojej strony — resztę formalności bierzemy na siebie.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SYTUACJA ============ -->
+  <section class="section" id="sytuacja">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Zacznij tutaj</div>
+        <h2>Wskaż swoją sytuację</h2>
+        <p class="dek">Cztery typowe punkty startowe. Wybierz ten, który dziś dotyczy Ciebie — pokażemy Ci dokładnie, co dzieje się dalej.</p>
+      </div>
+
+      <div class="sit-grid">
+        <a class="sit-card" href="#przylacze">
+          <div class="sit-card__top"><span class="sit-card__num">01</span><span class="sit-card__arrow">→</span></div>
+          <h3>Nie mam jeszcze przyłącza do sieci</h3>
+          <p>Działka lub budynek bez doprowadzonej energii. Pierwszym krokiem jest wniosek o warunki przyłączenia do właściwego operatora.</p>
+          <div class="sit-card__note">Zawsze zaczyna się od kontaktu z Twoim OSD — pomożemy ustalić, który to operator.</div>
+        </a>
+        <a class="sit-card" href="#licznik">
+          <div class="sit-card__top"><span class="sit-card__num">02</span><span class="sit-card__arrow">→</span></div>
+          <h3>Mam przyłącze, ale brak licznika</h3>
+          <p>Skrzynka przyłączeniowa już stoi na działce lub w budynku. Czas na montaż i formalne założenie licznika energii.</p>
+        </a>
+        <a class="sit-card" href="#licznik">
+          <div class="sit-card__top"><span class="sit-card__num">03</span><span class="sit-card__arrow">→</span></div>
+          <h3>Mam licznik, ale prąd nie jest jeszcze aktywny</h3>
+          <p>Licznik zamontowany, lecz umowa sprzedażowa lub zgłoszenie pierwszego uruchomienia wciąż czeka na dopięcie.</p>
+        </a>
+        <a class="sit-card" href="#przepisanie">
+          <div class="sit-card__top"><span class="sit-card__num">04</span><span class="sit-card__arrow">→</span></div>
+          <h3>Przepisuję licznik lub zmieniam dostawcę</h3>
+          <p>Kupiłeś, wynajmujesz lub odziedziczyłeś nieruchomość — albo po prostu szukasz lepszej oferty sprzedawcy energii.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 01 PRZYŁĄCZE ============ -->
+  <section class="section section--raised" id="przylacze">
+    <div class="wrap">
+      <div class="two-col">
+        <div>
+          <div class="section-head" style="margin-bottom:38px;">
+            <div class="eyebrow">01 / Przyłącze energetyczne</div>
+            <h2>Jak podłączyć prąd do działki lub domu?</h2>
+            <p class="dek">Podłączenie prądu do działki lub domu przebiega w pięciu ustalonych krokach — niezależnie od tego, czy Twoim operatorem jest Enea, Energa, Tauron, PGE czy Stoen.</p>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step__num">01</div>
+              <div class="step__body">
+                <h3>Wniosek o określenie warunków przyłączenia</h3>
+                <p>Składasz go do operatora właściwego dla lokalizacji działki lub budynku — to on decyduje o warunkach, nie sprzedawca energii.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step__num">02</div>
+              <div class="step__body">
+                <h3>Warunki przyłączenia</h3>
+                <p>Operator wydaje dokument z mocą przyłączeniową, planowanym terminem realizacji i szacowanym kosztem opłaty przyłączeniowej.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step__num">03</div>
+              <div class="step__body">
+                <h3>Umowa o przyłączenie do sieci</h3>
+                <p>Podpisujesz umowę i wnosisz opłatę przyłączeniową. To moment, w którym warto potwierdzić moc — jednofazową lub trójfazową.</p>
+                <span class="step__tag">1-fazowe / 3-fazowe</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step__num">04</div>
+              <div class="step__body">
+                <h3>Budowa odcinka przyłącza</h3>
+                <p>Operator (czasem wspólnie z inwestorem) wykonuje odcinek sieci łączący działkę lub budynek z siecią dystrybucyjną.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step__num">05</div>
+              <div class="step__body">
+                <h3>Montaż licznika i aktywacja</h3>
+                <p>Ostatni etap opisujemy szczegółowo niżej — obejmuje montaż licznika, umowę sprzedażową i pierwsze uruchomienie.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="schema">
+            <div class="schema__title">Ścieżka przyłączenia — schemat</div>
+            <div class="schema__row">
+              <div class="schema__node schema__node--live">W</div>
+              <div class="schema__wire"></div>
+              <div class="schema__node">U</div>
+              <div class="schema__wire"></div>
+              <div class="schema__node">B</div>
+              <div class="schema__wire"></div>
+              <div class="schema__node">M</div>
+            </div>
+            <div class="schema__labels">
+              <span>wniosek</span><span class="sp"></span><span>umowa</span><span class="sp"></span><span>budowa</span><span class="sp"></span><span>licznik</span>
+            </div>
+            <p class="schema__caption">Musisz się skontaktować ze swoim operatorem (OSD), zanim złożysz jakikolwiek inny wniosek — to on wyznacza warunki i termin całej ścieżki. Pomożemy Ci ustalić właściwego operatora dla Twojego adresu i przygotować pierwszy wniosek.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 KOSZTY ============ -->
+  <section class="section" id="koszty">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">02 / Wycena</div>
+        <h2>Ile kosztuje przyłącze prądu?</h2>
+        <p class="dek">Ostateczną kwotę zawsze wyznacza operator w dokumencie warunków przyłączenia — ale cztery czynniki decydują o rzędzie wielkości tej kwoty już na starcie.</p>
+      </div>
+
+      <div class="cost-grid">
+        <div class="cost-cell">
+          <div class="cost-cell__label">Moc przyłączeniowa</div>
+          <p>Im wyższa zamówiona moc (kW), tym wyższa opłata — warto od razu uwzględnić plany na pompę ciepła czy ładowarkę do samochodu.</p>
+        </div>
+        <div class="cost-cell">
+          <div class="cost-cell__label">Odległość od sieci</div>
+          <p>Dłuższy odcinek do wybudowania między siecią operatora a Twoją działką bezpośrednio podnosi koszt budowy przyłącza.</p>
+        </div>
+        <div class="cost-cell">
+          <div class="cost-cell__label">Rodzaj terenu i dostęp</div>
+          <p>Działka budowlana z dostępem do drogi rozlicza się inaczej niż teren rolny czy trudno dostępna nieruchomość.</p>
+        </div>
+        <div class="cost-cell">
+          <div class="cost-cell__label">Liczba faz — 1 czy 3</div>
+          <p>Przyłącze i licznik trójfazowy kosztują więcej niż jednofazowe, ale są wymagane przy większości nowoczesnych instalacji.</p>
+        </div>
+      </div>
+
+      <div class="range-panel">
+        <div class="range-panel__num">orientacyjnie</div>
+        <p class="range-panel__text">Rzeczywista opłata przyłączeniowa to zwykle <b>od kilkuset do kilkunastu tysięcy złotych</b> — zależnie od mocy, odległości i operatora. Wyślij zgłoszenie, a pomożemy oszacować koszt dla Twojego adresu, zanim złożysz oficjalny wniosek.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 LICZNIK ============ -->
+  <section class="section section--raised" id="licznik">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">03 / Montaż licznika</div>
+        <h2>Założenie i podłączenie licznika energii</h2>
+        <p class="dek">Masz już przyłącze, ale brakuje licznika — albo licznik stoi, lecz prąd wciąż nie jest aktywny? Oba przypadki kończy się w tym samym miejscu.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="steps">
+          <div class="step">
+            <div class="step__num">01</div>
+            <div class="step__body">
+              <h3>Komplet dokumentów</h3>
+              <p>Umowa o przyłączenie, tytuł prawny do nieruchomości oraz dane techniczne instalacji — operator wymaga ich przed montażem.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">02</div>
+            <div class="step__body">
+              <h3>Wybór licznika: 1-fazowy czy 3-fazowy</h3>
+              <p>Licznik jednofazowy wystarcza do podstawowych potrzeb domu; trójfazowy jest konieczny przy większej mocy lub instalacjach grzewczych.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">03</div>
+            <div class="step__body">
+              <h3>Umowa sprzedaży energii</h3>
+              <p>Bez aktywnej umowy ze sprzedawcą licznik może stać podłączony, a prąd i tak nie popłynie — to najczęściej pomijany krok.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">04</div>
+            <div class="step__body">
+              <h3>Montaż i pierwsze uruchomienie</h3>
+              <p>Operator montuje licznik, dokonuje odczytu początkowego i aktywuje dostawę — od tego momentu masz działający prąd.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="schema">
+          <div class="schema__title">Twoja sytuacja dziś</div>
+          <p style="font-size:15px; color:var(--ink-soft); margin-bottom:18px;"><b style="color:var(--ink);">Mam przyłącze, brak licznika</b><br>Zaczynasz od kroku 01 — kompletujesz dokumenty i zamawiasz montaż.</p>
+          <p style="font-size:15px; color:var(--ink-soft);"><b style="color:var(--ink);">Mam licznik, prąd nieaktywny</b><br>Najczęściej brakuje tylko kroku 03 — podpisania umowy sprzedaży energii.</p>
+          <div class="schema__caption" style="margin-top:22px; padding-top:18px; border-top:1px solid var(--line);">Nie wiesz, na którym etapie jesteś? Zgłoś się — sprawdzimy to razem, zanim cokolwiek złożysz.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04 PRZEPISANIE ============ -->
+  <section class="section" id="przepisanie">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">04 / Zmiana odbiorcy</div>
+        <h2>Przepisanie licznika na nowego właściciela</h2>
+        <p class="dek">Kupiłeś mieszkanie, wprowadzasz się do wynajętego domu albo przejąłeś nieruchomość w spadku — licznik trzeba formalnie przepisać, zanim zacznie się rozliczać na Twoje dane.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="steps">
+          <div class="step">
+            <div class="step__num">01</div>
+            <div class="step__body">
+              <h3>Zgłoszenie zmiany odbiorcy</h3>
+              <p>Informujesz operatora sieci oraz sprzedawcę energii o zmianie właściciela lub najemcy punktu poboru energii.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">02</div>
+            <div class="step__body">
+              <h3>Odczyt stanu licznika</h3>
+              <p>Na dzień przejęcia nieruchomości spisujecie wspólnie ze starym odbiorcą wskazania licznika — to podstawa rozliczenia.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step__num">03</div>
+            <div class="step__body">
+              <h3>Nowa umowa sprzedaży</h3>
+              <p>Podpisujesz umowę na siebie — możesz zostać przy dotychczasowym sprzedawcy albo od razu porównać oferty.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="schema">
+          <div class="schema__title">Najczęściej szukane: przepisanie licznika</div>
+          <p class="schema__caption" style="margin-top:0;">Formalności przy przepisaniu licznika różnią się szczegółami w zależności od operatora i sprzedawcy — pomagamy je dopełnić niezależnie od tego, czy Twój licznik obsługuje <b style="color:var(--ink);">Tauron</b>, PGE, Enea, Energa czy Stoen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 ZMIANA DOSTAWCY + OSD ============ -->
+  <section class="section section--raised" id="dostawca">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">05 / Sprzedawca energii</div>
+        <h2>Zmiana dostawcy energii</h2>
+        <p class="dek">Sprzedawcę energii możesz zmienić w dowolnym momencie, bez przerwy w dostawie prądu — operator sieci (OSD) odpowiedzialny za samo przyłącze się nie zmienia, zmienia się wyłącznie umowa sprzedażowa.</p>
+      </div>
+
+      <div class="osd-row" id="osdRow">
+        <button class="osd-btn" data-osd="enea">ENEA</button>
+        <button class="osd-btn" data-osd="energa">ENERGA</button>
+        <button class="osd-btn" data-osd="tauron">TAURON</button>
+        <button class="osd-btn" data-osd="pge">PGE</button>
+        <button class="osd-btn" data-osd="stoen">STOEN</button>
+      </div>
+      <p style="font-family:var(--mono); font-size:12.5px; color:var(--ink-faint);">Wybierz operatora, żeby zobaczyć krótką wskazówkę.</p>
+
+      <div class="osd-tip" id="osdTip"></div>
+    </div>
+  </section>
+
+  <!-- ============ JAK TO DZIAŁA ============ -->
+  <section class="section" id="proces">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Proces</div>
+        <h2>Jak to działa</h2>
+        <p class="dek">Cztery kroki od Twojego zgłoszenia do działającego prądu — niezależnie od tego, którą sytuację wskazałeś wyżej.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step__num">01</div>
+          <div class="step__body">
+            <h3>Wypełniasz krótki formularz</h3>
+            <p>Dwie minuty, tylko niezbędne dane — imię, telefon i informacja, kiedy najlepiej do Ciebie oddzwonić.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">02</div>
+          <div class="step__body">
+            <h3>Dobieramy właściwą ścieżkę</h3>
+            <p>Przyłącze, montaż licznika, aktywacja czy przepisanie — ustalamy dokładnie, czego potrzebujesz i u którego operatora.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">03</div>
+          <div class="step__body">
+            <h3>Ekspert dzwoni i prowadzi formalności</h3>
+            <p>Konsultant kompletuje z Tobą dokumenty i wnioski, tłumacząc każdy krok w zrozumiałym języku, bez urzędowego żargonu.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">04</div>
+          <div class="step__body">
+            <h3>Masz działający prąd</h3>
+            <p>Otrzymujesz potwierdzenie aktywacji u operatora — proces zamknięty, licznik działa.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section section--raised" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Pytania</div>
+        <h2>Najczęściej pytacie o to</h2>
+      </div>
+
+      <div class="faq">
+        <details class="faq-item" open>
+          <summary>Jak podłączyć prąd do działki?<span class="plus">+</span></summary>
+          <div class="faq-item__body">Zaczynasz od wniosku o warunki przyłączenia do operatora sieci właściwego dla Twojej lokalizacji. Po ich otrzymaniu podpisujesz umowę o przyłączenie, opłacasz przyłącze i czekasz na budowę odcinka sieci — na końcu następuje montaż licznika.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Ile kosztuje przyłącze prądu?<span class="plus">+</span></summary>
+          <div class="faq-item__body">To zależy głównie od zamówionej mocy, odległości od istniejącej sieci i liczby faz. Dokładną kwotę operator poda w dokumencie warunków przyłączenia — pomożemy Ci ją wcześniej oszacować.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Jak założyć licznik energii?<span class="plus">+</span></summary>
+          <div class="faq-item__body">Po zrealizowanym przyłączu składasz komplet dokumentów do operatora, wybierasz licznik jedno- lub trójfazowy i podpisujesz umowę sprzedaży energii. Operator montuje licznik i dokonuje pierwszego uruchomienia.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Jak przepisać licznik?<span class="plus">+</span></summary>
+          <div class="faq-item__body">Zgłaszasz zmianę odbiorcy do operatora sieci i sprzedawcy energii, wspólnie ze starym odbiorcą spisujecie stan licznika na dzień przejęcia, a następnie podpisujesz nową umowę na siebie.</div>
+        </details>
+        <details class="faq-item">
+          <summary>Czy mogę zmienić dostawcę energii bez przerwy w dostawie?<span class="plus">+</span></summary>
+          <div class="faq-item__body">Tak. Zmiana sprzedawcy nie wpływa na fizyczne dostarczanie prądu — tym nadal zajmuje się Twój operator sieci. Zmienia się wyłącznie umowa i podmiot, który wystawia Ci faktury.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FORM / KONTAKT ============ -->
+  <section class="section" id="kontakt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Zgłoszenie</div>
+        <h2>Zostaw kontakt — zajmiemy się resztą</h2>
+        <p class="dek">Wypełnij formularz, a nasz konsultant oddzwoni i przeprowadzi Cię przez formalności krok po kroku. Nie zostajesz sam z wnioskami.</p>
+      </div>
+
+      <form class="form-panel" id="leadForm">
+        <div id="formFields">
+          <div class="form-row">
+            <div class="field">
+              <label for="imie">Imię (opcjonalnie)</label>
+              <input type="text" id="imie" name="imie" placeholder="Jak mamy się do Ciebie zwracać?">
+            </div>
+            <div class="field">
+              <label for="telefon">Numer telefonu</label>
+              <input type="tel" id="telefon" name="telefon" placeholder="+48" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="email">Adres e-mail (opcjonalnie)</label>
+              <input type="email" id="email" name="email" placeholder="twoj@e-mail.pl">
+            </div>
+            <div class="field">
+              <label for="termin">Proszę o kontakt w dniu</label>
+              <input type="date" id="termin" name="termin">
+            </div>
+          </div>
+          <div class="field field--check" style="margin-bottom:26px;">
+            <input type="checkbox" id="zgoda" name="zgoda" required>
+            <label for="zgoda">Wyrażam jednorazową zgodę na kontakt telefoniczny w celu przygotowania oferty i przeprowadzenia formalności.</label>
+          </div>
+          <button type="submit" class="btn btn--primary form-submit">Wyślij zgłoszenie</button>
+          <p class="form-note">Wolisz porozmawiać od razu? Zostaw sam numer telefonu — oddzwonimy.</p>
+        </div>
+
+        <div class="form-success" id="formSuccess">
+          <h3>Zgłoszenie przyjęte.</h3>
+          <p>Nasz konsultant oddzwoni na podany numer, ustali szczegóły Twojej sytuacji i poprowadzi Cię przez dalsze formalności — aż do aktywnego licznika.</p>
+        </div>
+      </form>
+
+      <div class="kontakt-close">
+        <span class="dot"></span>
+        <span>Konsultant domyka sprawę telefonicznie — Ty tylko potwierdzasz szczegóły.</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a href="#top" class="brand" style="margin-bottom:14px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="4" cy="12" r="3" fill="#C4501A"/>
+            <line x1="7" y1="12" x2="17" y2="12" stroke="#C4501A" stroke-width="2"/>
+            <circle cx="20" cy="12" r="3" stroke="#C4501A" stroke-width="2"/>
+          </svg>
+          <span class="brand__word" style="color:var(--paper);"><b style="color:#C4501A;">PRZYŁĄCZ</b>.</span>
+        </a>
+        <p>Prowadzimy Cię przez przyłącza, liczniki, aktywację i przepisanie — niezależnie od operatora sieci.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Ścieżki</h4>
+        <a href="#przylacze">Przyłącze energetyczne</a>
+        <a href="#licznik">Montaż licznika</a>
+        <a href="#przepisanie">Przepisanie licznika</a>
+        <a href="#dostawca">Zmiana dostawcy</a>
+      </div>
+      <div class="foot-col">
+        <h4>Operatorzy (OSD)</h4>
+        <p>ENEA · ENERGA · TAURON</p>
+        <p>PGE · STOEN</p>
+      </div>
+      <div class="foot-col">
+        <h4>Kontakt</h4>
+        <a href="#kontakt">Zostaw zgłoszenie</a>
+        <p>kontakt@przylacz.pl</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 PRZYŁĄCZ. Serwis niezależny od operatorów sieci i sprzedawców energii.</p>
+      <p>Zaprojektowano jak schemat, nie jak formularz urzędowy.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- mobile nav toggle ---- */
+  var toggle = document.getElementById('navToggle');
+  var links = document.getElementById('navLinks');
+  if(toggle){
+    toggle.addEventListener('click', function(){
+      var open = links.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    links.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ links.classList.remove('is-open'); toggle.setAttribute('aria-expanded','false'); });
+    });
+  }
+
+  /* ---- scroll charge (progress) ---- */
+  var railEl = document.getElementById('rail');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main .section, main .hero'));
+
+  function buildRailNodes(){
+    if(!railEl) return;
+    var line = railEl.querySelector('.rail__line');
+    var doc = document.documentElement;
+    var total = doc.scrollHeight - window.innerHeight;
+    sections.forEach(function(sec){
+      if(sec.hasAttribute('data-rail-skip')) return;
+      var node = document.createElement('div');
+      node.className = 'rail__node';
+      node.dataset.target = sec.id || '';
+      var pct = (sec.offsetTop / doc.scrollHeight) * 100;
+      node.style.top = pct + '%';
+      line.appendChild(node);
+      sec.__railNode = node;
+    });
+  }
+
+  var ticking = false;
+  function updateCharge(){
+    ticking = false;
+    var doc = document.documentElement;
+    var scrolled = window.scrollY;
+    var max = doc.scrollHeight - window.innerHeight;
+    var pct = max > 0 ? Math.min(100, Math.max(0, (scrolled / max) * 100)) : 0;
+    document.documentElement.style.setProperty('--charge', pct.toFixed(2));
+
+    sections.forEach(function(sec){
+      if(!sec.__railNode) return;
+      var passed = (scrolled + window.innerHeight * 0.55) > sec.offsetTop;
+      sec.__railNode.classList.toggle('is-live', passed);
+    });
+  }
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(updateCharge); }
+  }
+
+  window.addEventListener('load', function(){
+    buildRailNodes();
+    updateCharge();
+  });
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', function(){
+    var line = railEl && railEl.querySelector('.rail__line');
+    if(line){ line.querySelectorAll('.rail__node').forEach(function(n){ n.remove(); }); }
+    buildRailNodes();
+    updateCharge();
+  });
+
+  /* ---- OSD tip toggles ---- */
+  var tips = {
+    enea: 'Enea Operator obsługuje głównie zachód Polski. Wnioski o przyłączenie, montaż licznika i zmianę odbiorcy złożysz przez elektroniczne biuro obsługi klienta.',
+    energa: 'Energa-Operator działa przede wszystkim w północnej i centralnej Polsce. Wniosek o przyłącze i zmianę sprzedawcy obsłużysz online lub w punkcie stacjonarnym.',
+    tauron: 'Tauron Dystrybucja to jeden z największych operatorów w kraju — to tu najczęściej dotyczy przepisanie licznika oraz podłączenie licznika trójfazowego.',
+    pge: 'PGE Dystrybucja obsługuje głównie wschodnią i centralną Polskę. Ponowne podłączenie prądu czy zmianę odbiorcy zgłosisz przez portal klienta operatora.',
+    stoen: 'Stoen Operator odpowiada za sieć w Warszawie. Jeśli Twoja nieruchomość znajduje się w stolicy, to właśnie tam trafia Twój wniosek o przyłącze.'
+  };
+  var osdBtns = document.querySelectorAll('.osd-btn');
+  var osdTip = document.getElementById('osdTip');
+  osdBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var key = btn.dataset.osd;
+      var already = btn.classList.contains('is-active');
+      osdBtns.forEach(function(b){ b.classList.remove('is-active'); });
+      if(already){
+        osdTip.classList.remove('is-visible');
+        return;
+      }
+      btn.classList.add('is-active');
+      osdTip.textContent = tips[key] || '';
+      osdTip.classList.add('is-visible');
+    });
+  });
+
+  /* ---- form submit (demo) ---- */
+  var form = document.getElementById('leadForm');
+  var fields = document.getElementById('formFields');
+  var success = document.getElementById('formSuccess');
+  if(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      fields.style.display = 'none';
+      success.classList.add('is-visible');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

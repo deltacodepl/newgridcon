@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSD/PILOT — Podłączenie prądu, licznik, aktywacja</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#FFFFFF;
+  --paper-alt:#EEF2F5;
+  --paper-deep:#E4E9ED;
+  --ink:#12161A;
+  --ink-soft:#52585E;
+  --ink-faint:#8A9096;
+  --signal:#FF4D1C;
+  --signal-ink:#B23200;
+  --current:#1E5AFF;
+  --go:#1C8A5E;
+  --line:#D7DBDE;
+  --line-strong:#12161A;
+  --radius:2px;
+  --rail-w:58px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  margin:0;
+  letter-spacing:-0.01em;
+}
+.mono{ font-family:'IBM Plex Mono',monospace; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+:focus-visible{ outline:2px solid var(--current); outline-offset:3px; }
+img,svg{ display:block; max-width:100%; }
+
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.72rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--signal-ink);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:14px;
+}
+.eyebrow::before{
+  content:"";
+  width:8px;height:8px;
+  background:var(--signal);
+  display:inline-block;
+  border-radius:50%;
+  flex:none;
+}
+
+.wrap{
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 32px;
+}
+@media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+/* ---------- HEADER ---------- */
+header.top{
+  position:fixed; top:0; left:0; right:0;
+  height:64px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+  z-index:200;
+  display:flex; align-items:center;
+}
+header.top .wrap{ display:flex; align-items:center; justify-content:space-between; width:100%; }
+.logo{ display:flex; align-items:baseline; gap:2px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.15rem; }
+.logo .slash{ color:var(--signal); }
+.logo small{ font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:.62rem; letter-spacing:.1em; color:var(--ink-soft); display:block; margin-top:1px; text-transform:uppercase; }
+.head-right{ display:flex; align-items:center; gap:22px; }
+.head-phone{ display:flex; flex-direction:column; align-items:flex-end; font-family:'IBM Plex Mono',monospace; }
+.head-phone a{ font-size:.92rem; font-weight:600; }
+.head-phone span{ font-size:.66rem; color:var(--ink-faint); }
+.btn{
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:600;
+  font-size:.78rem;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  padding:11px 18px;
+  border:1px solid var(--ink);
+  background:var(--ink);
+  color:#fff;
+  border-radius:var(--radius);
+  display:inline-flex; align-items:center; gap:8px;
+  transition:background .15s, color .15s, transform .1s;
+}
+.btn:hover{ background:var(--signal); border-color:var(--signal); }
+.btn:active{ transform:translateY(1px); }
+.btn.ghost{ background:transparent; color:var(--ink); }
+.btn.ghost:hover{ background:var(--ink); color:#fff; }
+.btn.line{ background:transparent; color:var(--ink); border-color:var(--line-strong); }
+.btn.line:hover{ background:var(--ink); color:#fff; }
+.btn:disabled{ opacity:.35; cursor:not-allowed; }
+.btn:disabled:hover{ background:var(--ink); border-color:var(--ink); }
+@media (max-width:760px){ .head-phone{ display:none; } }
+
+/* ---------- MOBILE PROGRESS ---------- */
+.mprog{
+  position:fixed; top:64px; left:0; right:0; height:3px;
+  background:var(--paper-alt); z-index:190; display:none;
+}
+.mprog i{ display:block; height:100%; width:0%; background:var(--signal); transition:width .1s linear; }
+@media (max-width:959px){ .mprog{ display:block; } }
+
+/* ---------- RAIL ---------- */
+.rail{
+  position:fixed; top:64px; bottom:0; left:0; width:var(--rail-w);
+  z-index:150; display:flex; align-items:center; justify-content:center;
+}
+@media (max-width:959px){ .rail{ display:none; } }
+.rail-track{
+  position:relative; width:2px; height:78%; background:var(--line);
+}
+.rail-fill{
+  position:absolute; top:0; left:0; width:100%; height:0%;
+  background:var(--signal);
+  transition:height .12s linear;
+}
+.rail-dot{
+  position:absolute; left:50%; transform:translate(-50%,-50%);
+  width:9px;height:9px;border-radius:50%;
+  background:var(--paper); border:2px solid var(--ink-faint);
+  transition:border-color .2s, background .2s, transform .2s;
+}
+.rail-dot .rl{
+  position:absolute; left:20px; top:50%; transform:translateY(-50%);
+  white-space:nowrap;
+  font-family:'IBM Plex Mono',monospace; font-size:.66rem; letter-spacing:.06em;
+  color:var(--ink-soft); opacity:0; pointer-events:none;
+  transition:opacity .15s;
+}
+.rail-dot.active{ border-color:var(--signal); background:var(--signal); transform:translate(-50%,-50%) scale(1.25); }
+.rail-dot.active .rl{ opacity:1; color:var(--ink); }
+
+main{ padding-left:0; }
+@media (min-width:960px){ main{ padding-left:var(--rail-w); } }
+
+section{ padding:104px 0 96px; position:relative; }
+section.alt{ background:var(--paper-alt); }
+.rev{ opacity:0; transform:translateY(18px); transition:opacity .5s ease, transform .5s ease; }
+.rev.in{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){ .rev{ opacity:1; transform:none; transition:none; } }
+
+hr.hair{ border:none; border-top:1px solid var(--line); margin:0; }
+
+/* ---------- HERO ---------- */
+.hero{ padding-top:150px; }
+.hero-grid{ display:grid; grid-template-columns:1.15fr .85fr; gap:56px; align-items:start; }
+@media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+.hero h1{ font-size:clamp(2.15rem,4.6vw,3.7rem); line-height:1.04; }
+.hero h1 .accent{ color:var(--signal); }
+.hero p.lead{ font-size:1.08rem; color:var(--ink-soft); max-width:52ch; margin:22px 0 0; }
+
+.pills{ display:flex; flex-wrap:wrap; gap:8px; margin:28px 0 0; }
+.pill{
+  font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.03em;
+  text-transform:uppercase; padding:7px 12px; border:1px solid var(--line);
+  border-radius:100px; color:var(--ink-soft); display:flex; align-items:center; gap:6px;
+}
+.pill::before{ content:""; width:5px;height:5px;border-radius:50%; background:var(--current); }
+
+.stats{ display:flex; gap:36px; margin-top:44px; padding-top:26px; border-top:1px solid var(--line); flex-wrap:wrap; }
+.stat b{ display:block; font-family:'Space Grotesk',sans-serif; font-size:1.7rem; }
+.stat span{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); }
+
+/* help panel */
+.panel{
+  border:1px solid var(--line-strong); border-radius:var(--radius); background:var(--paper);
+}
+.panel-head{
+  padding:16px 20px; border-bottom:1px solid var(--line-strong);
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+}
+.panel-head .tag{ color:var(--signal-ink); }
+.opt{
+  display:flex; gap:16px; align-items:flex-start;
+  padding:22px 20px; border-bottom:1px solid var(--line);
+  position:relative; cursor:pointer; background:none; width:100%; text-align:left; border-left:0; border-right:0; border-top:0;
+  transition:background .15s;
+}
+.opt:last-child{ border-bottom:none; }
+.opt:hover{ background:var(--paper-alt); }
+.opt .node{ flex:none; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--ink); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:.72rem; margin-top:2px; }
+.opt:hover .node{ border-color:var(--signal); color:var(--signal-ink); }
+.opt .otitle{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.02rem; margin-bottom:4px; }
+.opt .odesc{ font-size:.88rem; color:var(--ink-soft); }
+.opt .arrow{ margin-left:auto; align-self:center; flex:none; opacity:.4; transition:transform .15s, opacity .15s; }
+.opt:hover .arrow{ transform:translateX(3px); opacity:1; color:var(--signal); }
+
+/* ---------- PROCESS ---------- */
+.sec-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:48px; flex-wrap:wrap; }
+.sec-head h2{ font-size:clamp(1.6rem,3vw,2.3rem); max-width:18ch; }
+.sec-head p{ color:var(--ink-soft); max-width:42ch; margin:10px 0 0; font-size:.96rem; }
+
+.process-track{
+  display:flex; gap:0; overflow-x:auto; padding-bottom:8px; margin:0 -4px;
+  scroll-snap-type:x proximity;
+}
+.process-track::-webkit-scrollbar{ height:5px; }
+.process-track::-webkit-scrollbar-thumb{ background:var(--line); }
+.stop{
+  flex:0 0 240px; scroll-snap-align:start; padding:0 18px 0 0; position:relative;
+}
+.stop::before{
+  content:""; position:absolute; top:15px; left:0; right:18px; height:1px; background:var(--line);
+}
+.stop:last-child::before{ display:none; }
+.stop-dot{
+  width:14px;height:14px;border-radius:50%; background:var(--paper); border:2px solid var(--ink);
+  margin-bottom:22px; position:relative; z-index:2;
+}
+.stop:nth-child(6) .stop-dot, .stop.final .stop-dot{ background:var(--go); border-color:var(--go); }
+.stop-num{ font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:var(--signal-ink); letter-spacing:.06em; }
+.stop h3{ font-size:1.02rem; margin:6px 0 8px; font-family:'Space Grotesk',sans-serif; }
+.stop p{ font-size:.85rem; color:var(--ink-soft); margin:0; padding-right:8px; }
+
+/* ---------- COST ---------- */
+.cost-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+@media (max-width:820px){ .cost-grid{ grid-template-columns:1fr; } }
+.cost-card{ background:var(--paper); padding:30px 26px; }
+.cost-card .tag{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.cost-card h3{ font-size:1.12rem; margin:10px 0 10px; }
+.cost-card p{ font-size:.9rem; color:var(--ink-soft); margin:0 0 18px; }
+.impact{ display:flex; align-items:center; gap:10px; }
+.impact .bar{ flex:1; height:5px; background:var(--paper-alt); border-radius:100px; overflow:hidden; }
+.impact .bar i{ display:block; height:100%; background:var(--signal); }
+.impact span{ font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--ink-faint); white-space:nowrap; }
+.note{
+  margin-top:26px; padding:16px 18px; border:1px dashed var(--line-strong); font-size:.85rem; color:var(--ink-soft);
+  display:flex; gap:12px; align-items:flex-start;
+}
+.note b{ color:var(--ink); }
+
+/* ---------- METER ---------- */
+.meter-grid{ display:grid; grid-template-columns:1fr .8fr; gap:60px; align-items:center; }
+@media (max-width:900px){ .meter-grid{ grid-template-columns:1fr; } }
+.legend{ margin-top:22px; border-top:1px solid var(--line); }
+.legend dt{ font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600; color:var(--current); padding-top:14px; }
+.legend dd{ margin:2px 0 14px; font-size:.88rem; color:var(--ink-soft); }
+.meter-diagram{ background:var(--paper-alt); border:1px solid var(--line); padding:24px; border-radius:var(--radius); }
+
+/* ---------- OSD GRID ---------- */
+.osd-grid{ display:grid; grid-template-columns:repeat(5,1fr); border:1px solid var(--line); }
+@media (max-width:900px){ .osd-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:560px){ .osd-grid{ grid-template-columns:repeat(2,1fr); } }
+.osd-cell{
+  padding:26px 18px; border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+  position:relative; overflow:hidden;
+}
+.osd-grid .osd-cell:nth-child(5n){ border-right:none; }
+.osd-cell::after{
+  content:""; position:absolute; left:0; bottom:0; height:3px; width:0%; background:var(--signal);
+  transition:width .2s;
+}
+.osd-cell:hover::after{ width:100%; }
+.osd-code{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.3rem; }
+.osd-name{ font-size:.78rem; color:var(--ink-soft); margin-top:4px; }
+.osd-region{ font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--ink-faint); margin-top:10px; display:block; }
+
+/* ---------- FORM ---------- */
+.form-shell{ max-width:760px; margin:0 auto; }
+.tabs{ display:flex; border:1px solid var(--ink); border-radius:var(--radius); overflow:hidden; margin-bottom:34px; }
+.tab{ flex:1; padding:15px; text-align:center; background:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; font-weight:600; border:none; color:var(--ink-soft); }
+.tab + .tab{ border-left:1px solid var(--ink); }
+.tab.active{ background:var(--ink); color:#fff; }
+
+.stepper{ display:flex; align-items:center; margin-bottom:30px; gap:0; }
+.sdot{ display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; flex:1; }
+.sdot .c{ width:26px;height:26px;border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:.72rem; background:var(--paper); z-index:2; color:var(--ink-faint); }
+.sdot .l{ font-family:'IBM Plex Mono',monospace; font-size:.6rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); text-align:center; }
+.sdot::before{ content:""; position:absolute; top:13px; left:-50%; width:100%; height:1px; background:var(--line); z-index:1; }
+.sdot:first-child::before{ display:none; }
+.sdot.done .c{ border-color:var(--go); background:var(--go); color:#fff; }
+.sdot.done .l{ color:var(--ink); }
+.sdot.now .c{ border-color:var(--signal); color:var(--signal-ink); }
+.sdot.now .l{ color:var(--ink); }
+
+.card{ border:1px solid var(--line-strong); padding:32px; border-radius:var(--radius); background:var(--paper); }
+@media (max-width:560px){ .card{ padding:22px; } }
+.card h3{ font-size:1.25rem; margin-bottom:6px; }
+.card > p.sub{ color:var(--ink-soft); font-size:.9rem; margin:0 0 24px; }
+.hidden{ display:none !important; }
+
+.field{ margin-bottom:18px; }
+.field label{ display:block; font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:7px; }
+.field input[type=text], .field input[type=email], .field input[type=tel], .field input[type=number], .field input[type=date], .field select{
+  width:100%; padding:12px 13px; border:1px solid var(--line-strong); border-radius:var(--radius); font-family:'Inter',sans-serif; font-size:.94rem; background:var(--paper); color:var(--ink);
+}
+.field input:focus, .field select:focus{ border-color:var(--current); }
+.field .hint{ font-size:.76rem; color:var(--ink-faint); margin-top:5px; }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.row3{ display:grid; grid-template-columns:2fr 1fr 1fr; gap:16px; }
+@media (max-width:560px){ .row2,.row3{ grid-template-columns:1fr; } }
+
+.check{ display:flex; align-items:flex-start; gap:10px; margin-bottom:14px; cursor:pointer; }
+.check input{ margin-top:3px; flex:none; width:16px; height:16px; accent-color:var(--signal); }
+.check span{ font-size:.86rem; color:var(--ink-soft); }
+
+.offer-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+@media (max-width:640px){ .offer-grid{ grid-template-columns:1fr; } }
+.offer{ border:1.5px solid var(--line-strong); padding:20px; border-radius:var(--radius); cursor:pointer; position:relative; transition:border-color .15s, background .15s; }
+.offer:hover{ border-color:var(--current); }
+.offer.sel{ border-color:var(--signal); background:#FFF4EF; }
+.offer .otag{ font-family:'IBM Plex Mono',monospace; font-size:.64rem; color:var(--ink-faint); text-transform:uppercase; }
+.offer h4{ font-family:'Space Grotesk',sans-serif; font-size:1.05rem; margin:6px 0 8px; }
+.offer ul{ margin:0; padding-left:16px; font-size:.8rem; color:var(--ink-soft); }
+.offer ul li{ margin-bottom:4px; }
+.offer .rd{ position:absolute; top:16px; right:16px; width:15px;height:15px; border-radius:50%; border:1.5px solid var(--ink-faint); }
+.offer.sel .rd{ border-color:var(--signal); background:var(--signal); }
+
+.osd-picker{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.osd-btn{ padding:10px 16px; border:1.5px solid var(--line-strong); border-radius:100px; background:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:.78rem; font-weight:600; }
+.osd-btn.sel{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.osd-context{ font-size:.85rem; color:var(--ink-soft); background:var(--paper-alt); border-left:3px solid var(--current); padding:12px 14px; margin-bottom:20px; display:none; }
+.osd-context.show{ display:block; }
+
+.situ{ display:flex; flex-direction:column; gap:10px; margin-bottom:8px; }
+.sopt{ border:1.5px solid var(--line-strong); border-radius:var(--radius); padding:16px 18px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; }
+.sopt:hover{ border-color:var(--current); }
+.sopt.sel{ border-color:var(--signal); background:#FFF4EF; }
+.sopt .rd{ width:16px;height:16px;border-radius:50%; border:1.5px solid var(--ink-faint); flex:none; margin-top:2px; }
+.sopt.sel .rd{ border-color:var(--signal); background:var(--signal); }
+.sopt b{ display:block; font-size:.95rem; font-family:'Space Grotesk',sans-serif; }
+.sopt small{ color:var(--ink-soft); font-size:.8rem; }
+
+.acc{ margin-top:18px; border-top:1px solid var(--line); }
+.acc-item{ border-bottom:1px solid var(--line); }
+.acc-head{ width:100%; background:none; border:none; padding:14px 0; display:flex; justify-content:space-between; align-items:center; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:.92rem; }
+.acc-body{ display:none; padding:0 0 16px; font-size:.86rem; color:var(--ink-soft); }
+.acc-item.open .acc-body{ display:block; }
+.acc-item.open .chev{ transform:rotate(180deg); }
+.chev{ transition:transform .15s; flex:none; }
+
+.summary-grid{ display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--line); border:1px solid var(--line); margin-bottom:22px; font-size:.84rem; }
+@media (max-width:560px){ .summary-grid{ grid-template-columns:1fr; } }
+.sitem{ background:var(--paper); padding:12px 14px; }
+.sitem b{ display:block; font-family:'IBM Plex Mono',monospace; font-size:.62rem; text-transform:uppercase; color:var(--ink-faint); margin-bottom:3px; letter-spacing:.04em; }
+
+.nav-btns{ display:flex; justify-content:space-between; margin-top:26px; gap:14px; }
+
+.done-box{ text-align:center; padding:20px 10px 6px; }
+.done-icon{ width:56px;height:56px; border-radius:50%; background:var(--go); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; }
+.done-box h3{ font-size:1.4rem; }
+.done-box p{ color:var(--ink-soft); max-width:42ch; margin:12px auto 0; font-size:.94rem; }
+.done-ref{ margin-top:22px; display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:.78rem; background:var(--paper-alt); padding:8px 14px; border-radius:100px; }
+
+.upload{ border:1.5px dashed var(--line-strong); border-radius:var(--radius); padding:20px; text-align:center; font-size:.85rem; color:var(--ink-soft); cursor:pointer; }
+.upload:hover{ border-color:var(--current); }
+
+/* ---------- FOOTER ---------- */
+footer{ border-top:1px solid var(--line-strong); padding:56px 0 28px; }
+.foot-grid{ display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:32px; margin-bottom:40px; }
+@media (max-width:760px){ .foot-grid{ grid-template-columns:1fr 1fr; } }
+.foot-grid h4{ font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; }
+.foot-grid ul{ list-style:none; margin:0; padding:0; }
+.foot-grid li{ margin-bottom:9px; font-size:.88rem; }
+.foot-grid a:hover{ color:var(--signal-ink); }
+.foot-bottom{ border-top:1px solid var(--line); padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:var(--ink-faint); }
+</style>
+</head>
+<body>
+
+<div class="mprog"><i id="mprogFill"></i></div>
+
+<header class="top">
+  <div class="wrap">
+    <a href="#s-hero" class="logo">OSD<span class="slash">/</span>PILOT<small>Nawigacja przyłączeniowa</small></a>
+    <div class="head-right">
+      <div class="head-phone">
+        <a href="tel:+48800000000">+48 800 000 000</a>
+        <span>pon–pt 8:00–18:00</span>
+      </div>
+      <a href="#s-form" class="btn">Wypełnij formularz</a>
+    </div>
+  </div>
+</header>
+
+<div class="rail" id="rail">
+  <div class="rail-track">
+    <div class="rail-fill" id="railFill"></div>
+    <!-- dots injected by JS -->
+  </div>
+</div>
+
+<main>
+
+<!-- ================= HERO ================= -->
+<section id="s-hero" class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Przyłącza · Liczniki · Aktywacja prądu</div>
+      <h1>Podłączenie prądu ma swoją <span class="accent">trasę</span>. My ją znamy.</h1>
+      <p class="lead">Prowadzimy Cię krok po kroku przez formalności z operatorem sieci (OSD) i sprzedawcą energii — od wniosku o przyłącze, przez montaż licznika, po pierwszą aktywację prądu w domu, mieszkaniu lub na działce.</p>
+
+      <div class="pills">
+        <span class="pill">Nowe przyłącze</span>
+        <span class="pill">Montaż licznika</span>
+        <span class="pill">Aktywacja prądu</span>
+        <span class="pill">Zmiana dostawcy</span>
+        <span class="pill">Przepisanie licznika</span>
+        <span class="pill">Ponowne podłączenie</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b class="mono">5</b><span>Operatorów OSD w systemie</span></div>
+        <div class="stat"><b class="mono">3</b><span>Kroki formularza online</span></div>
+        <div class="stat"><b class="mono">1</b><span>Opiekun na całej trasie</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span>01 — Start</span>
+        <span class="tag">Jak możemy Ci pomóc?</span>
+      </div>
+      <button class="opt" data-choose="phone">
+        <div class="node">A</div>
+        <div>
+          <div class="otitle">Wolę porozmawiać</div>
+          <div class="odesc">Zostaw numer — oddzwonimy i przeprowadzimy Cię przez zgłoszenie krok po kroku.</div>
+        </div>
+        <div class="arrow">→</div>
+      </button>
+      <button class="opt" data-choose="online">
+        <div class="node">B</div>
+        <div>
+          <div class="otitle">Wolę zrobić to online</div>
+          <div class="odesc">Wskaż swoją sytuację i wypełnij formularz w 3 krokach — zajmuje ok. 4 minuty.</div>
+        </div>
+        <div class="arrow">→</div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<hr class="hair">
+
+<!-- ================= PROCESS ================= -->
+<section id="s-process">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <h2>Jak podłączyć prąd do domu?</h2>
+      <p>Cała trasa — od wniosku do OSD po pierwszy prąd w liczniku — składa się z sześciu przystanków. Pilotujemy Cię przez każdy z nich.</p>
+    </div>
+
+    <div class="process-track rev">
+      <div class="stop">
+        <div class="stop-dot"></div>
+        <div class="stop-num">01</div>
+        <h3>Wniosek o warunki przyłączenia</h3>
+        <p>Składasz wniosek do właściwego OSD — PGE, Tauron, Enea, Energa lub Stoen — dla swojej działki lub budynku.</p>
+      </div>
+      <div class="stop">
+        <div class="stop-dot"></div>
+        <div class="stop-num">02</div>
+        <h3>Umowa przyłączeniowa</h3>
+        <p>OSD wydaje warunki przyłączenia i umowę z opłatą, zależną od mocy i odległości od sieci.</p>
+      </div>
+      <div class="stop">
+        <div class="stop-dot"></div>
+        <div class="stop-num">03</div>
+        <h3>Budowa przyłącza</h3>
+        <p>Wykonawca OSD doprowadza linię energetyczną do granicy działki lub do budynku.</p>
+      </div>
+      <div class="stop">
+        <div class="stop-dot"></div>
+        <div class="stop-num">04</div>
+        <h3>Montaż licznika</h3>
+        <p>Zakładany jest licznik energii i nadawany numer Punktu Poboru Energii (PPE).</p>
+      </div>
+      <div class="stop">
+        <div class="stop-dot"></div>
+        <div class="stop-num">05</div>
+        <h3>Umowa sprzedaży</h3>
+        <p>Podpisujesz umowę z wybranym sprzedawcą energii — dostawcę możesz zmienić w każdej chwili.</p>
+      </div>
+      <div class="stop final">
+        <div class="stop-dot"></div>
+        <div class="stop-num">06</div>
+        <h3>Aktywacja</h3>
+        <p>Dystrybutor uruchamia dostawę energii. Od tego momentu masz działający prąd w liczniku.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COST ================= -->
+<section class="alt" id="s-cost">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <h2>Ile kosztuje przyłącze prądu?</h2>
+      <p>Dokładną kwotę wylicza OSD indywidualnie, według aktualnej taryfy przyłączeniowej. Na koszt wpływają trzy czynniki:</p>
+    </div>
+
+    <div class="cost-grid rev">
+      <div class="cost-card">
+        <span class="tag">Czynnik 01</span>
+        <h3>Moc przyłączeniowa</h3>
+        <p>Im wyższa zamawiana moc (kW), tym wyższa opłata przyłączeniowa naliczana przez operatora.</p>
+        <div class="impact"><div class="bar"><i style="width:80%"></i></div><span>Wpływ: wysoki</span></div>
+      </div>
+      <div class="cost-card">
+        <span class="tag">Czynnik 02</span>
+        <h3>Odległość od sieci</h3>
+        <p>Im dalej działka leży od istniejącej sieci energetycznej, tym więcej infrastruktury trzeba wybudować.</p>
+        <div class="impact"><div class="bar"><i style="width:65%"></i></div><span>Wpływ: średni–wysoki</span></div>
+      </div>
+      <div class="cost-card">
+        <span class="tag">Czynnik 03</span>
+        <h3>Grupa taryfowa i typ obiektu</h3>
+        <p>Gospodarstwo domowe, firma czy budowa — każdy typ obiektu ma inną stawkę i procedurę zgłoszeniową.</p>
+        <div class="impact"><div class="bar"><i style="width:45%"></i></div><span>Wpływ: średni</span></div>
+      </div>
+    </div>
+
+    <div class="note rev">
+      <span>i</span>
+      <div><b>Orientacyjnie, nie ostatecznie.</b> Powyższe czynniki tylko szacują kierunek kosztu — dokładną kwotę poznasz dopiero po złożeniu wniosku do OSD. Wypełnij formularz, a pomożemy Ci przygotować wniosek i oszacować koszt dla Twojej lokalizacji.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METER ================= -->
+<section id="s-meter">
+  <div class="wrap meter-grid">
+    <div class="rev">
+      <div class="eyebrow">Licznik energii</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.1rem); max-width:20ch;">Założenie i podłączenie licznika energii</h2>
+      <p style="color:var(--ink-soft); margin-top:14px; max-width:52ch;">Licznik zakłada operator sieci (OSD) po zakończeniu budowy przyłącza — albo od razu, jeśli przyłącze już istnieje, a licznik trzeba tylko podłączyć, ponownie uruchomić lub przepisać na nowego właściciela mieszkania czy domu.</p>
+
+      <dl class="legend">
+        <dt>PPE — Punkt Poboru Energii</dt>
+        <dd>Unikalny numer identyfikujący Twój licznik w systemie OSD. Znajdziesz go na fakturze lub umowie — jeśli go nie masz, pomożemy go ustalić.</dd>
+        <dt>Grupa taryfowa</dt>
+        <dd>G11 (jedna strefa), G12 (dwie strefy — dzień/noc), G12w (weekendowa) lub G13 — dobierana m.in. pod pompy ciepła i auta elektryczne.</dd>
+        <dt>Ponowne podłączenie i przepisanie licznika</dt>
+        <dd>Kupujesz mieszkanie z istniejącym przyłączem albo wracasz po dłuższej przerwie? Licznik można przepisać na nowego właściciela lub ponownie aktywować bez budowy nowego przyłącza.</dd>
+      </dl>
+    </div>
+
+    <div class="rev">
+      <div class="meter-diagram">
+        <svg viewBox="0 0 320 300" width="100%">
+          <circle cx="160" cy="120" r="86" fill="none" stroke="#12161A" stroke-width="1.5"/>
+          <circle cx="160" cy="120" r="86" fill="none" stroke="#FF4D1C" stroke-width="3" stroke-dasharray="8 300" stroke-dashoffset="-40"/>
+          <g stroke="#8A9096" stroke-width="1.5">
+            <line x1="160" y1="38" x2="160" y2="50"/>
+            <line x1="160" y1="190" x2="160" y2="202"/>
+            <line x1="78" y1="120" x2="90" y2="120"/>
+            <line x1="230" y1="120" x2="242" y2="120"/>
+            <line x1="102" y1="62" x2="110" y2="70"/>
+            <line x1="218" y1="62" x2="210" y2="70"/>
+            <line x1="102" y1="178" x2="110" y2="170"/>
+            <line x1="218" y1="178" x2="210" y2="170"/>
+          </g>
+          <line x1="160" y1="120" x2="192" y2="82" stroke="#12161A" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="160" cy="120" r="6" fill="#12161A"/>
+          <text x="160" y="240" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#52585E">kWh / rok</text>
+          <line x1="160" y1="206" x2="160" y2="228" stroke="#D7DBDE"/>
+          <line x1="20" y1="270" x2="120" y2="270" stroke="#1E5AFF" stroke-width="1.5"/>
+          <circle cx="20" cy="270" r="3" fill="#1E5AFF"/>
+          <text x="128" y="274" font-family="IBM Plex Mono, monospace" font-size="10" fill="#52585E">PPE</text>
+          <line x1="200" y1="270" x2="300" y2="270" stroke="#1C8A5E" stroke-width="1.5"/>
+          <circle cx="300" cy="270" r="3" fill="#1C8A5E"/>
+          <text x="150" y="274" font-family="IBM Plex Mono, monospace" font-size="10" fill="#52585E">taryfa</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OSD GRID ================= -->
+<section class="alt" id="s-osd">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <h2>Działamy z każdym operatorem</h2>
+      <p>W Polsce działa pięciu operatorów systemu dystrybucyjnego — obsługujemy zgłoszenia do każdego z nich.</p>
+    </div>
+    <div class="osd-grid rev">
+      <div class="osd-cell"><div class="osd-code">PGE</div><div class="osd-name">PGE Dystrybucja</div><span class="osd-region">Polska centralna i wschodnia</span></div>
+      <div class="osd-cell"><div class="osd-code">TAU</div><div class="osd-name">Tauron Dystrybucja</div><span class="osd-region">Śląsk, Małopolska</span></div>
+      <div class="osd-cell"><div class="osd-code">ENA</div><div class="osd-name">Enea Operator</div><span class="osd-region">Polska zachodnia i płn.-zach.</span></div>
+      <div class="osd-cell"><div class="osd-code">ENG</div><div class="osd-name">Energa-Operator</div><span class="osd-region">Pomorze, Kujawy</span></div>
+      <div class="osd-cell"><div class="osd-code">STO</div><div class="osd-name">Stoen Operator</div><span class="osd-region">Warszawa i okolice</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FORM ================= -->
+<section id="s-form">
+  <div class="wrap form-shell">
+    <div class="sec-head rev" style="display:block;">
+      <h2>Zgłoś się — wyznaczymy Twoją trasę</h2>
+      <p>Wybierz, jak wolisz załatwić formalności. W każdej chwili możesz zmienić ścieżkę.</p>
+    </div>
+
+    <div class="tabs rev">
+      <button class="tab" id="tabPhone" data-tab="phone">Oddzwonimy do Ciebie</button>
+      <button class="tab active" id="tabOnline" data-tab="online">Zrobię to online</button>
+    </div>
+
+    <!-- PHONE PATH -->
+    <div id="panelPhone" class="hidden rev">
+      <div class="card" id="cardPhoneForm">
+        <h3>Zamów kontakt telefoniczny</h3>
+        <p class="sub">Podaj numer telefonu — oddzwonimy w wybranym terminie i pomożemy dopiąć zgłoszenie.</p>
+
+        <div class="field">
+          <label for="pImie">Imię (opcjonalnie)</label>
+          <input type="text" id="pImie" placeholder="Jan">
+        </div>
+        <div class="field">
+          <label for="pTel">Numer telefonu</label>
+          <input type="tel" id="pTel" placeholder="600 000 000">
+        </div>
+        <div class="field">
+          <label for="pMail">Adres e-mail (opcjonalnie)</label>
+          <input type="email" id="pMail" placeholder="jan@przyklad.pl">
+        </div>
+        <div class="field">
+          <label for="pData">Proszę o kontakt w dniu</label>
+          <input type="date" id="pData">
+        </div>
+        <label class="check">
+          <input type="checkbox" id="pZgoda">
+          <span>Wyrażam jednorazową zgodę na kontakt telefoniczny w celu obsługi zgłoszenia.</span>
+        </label>
+
+        <div class="nav-btns">
+          <span></span>
+          <button class="btn" id="pSubmit">Zamów oddzwonienie</button>
+        </div>
+      </div>
+
+      <div class="card hidden" id="cardPhoneDone">
+        <div class="done-box">
+          <div class="done-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Zgłoszenie przyjęte</h3>
+          <p>Oddzwonimy w wybranym terminie pod podany numer. Do tego czasu przygotuj, jeśli masz pod ręką, ostatnią fakturę za prąd lub numer PPE — przyspieszy to rozmowę.</p>
+          <span class="done-ref mono">REF: KOMPAS-<span id="refPhone"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONLINE PATH -->
+    <div id="panelOnline" class="rev">
+
+      <div class="stepper" id="stepper">
+        <div class="sdot" data-step="0"><div class="c">1</div><div class="l">Sytuacja</div></div>
+        <div class="sdot" data-step="1"><div class="c">2</div><div class="l">Oferta</div></div>
+        <div class="sdot" data-step="2"><div class="c">3</div><div class="l">Dane</div></div>
+        <div class="sdot" data-step="3"><div class="c">4</div><div class="l">Licznik</div></div>
+        <div class="sdot" data-step="4"><div class="c">5</div><div class="l">Podsumowanie</div></div>
+      </div>
+
+      <!-- STEP 0: SITUATION -->
+      <div class="card step" data-step="0">
+        <h3>Jaka jest Twoja obecna sytuacja?</h3>
+        <p class="sub">Formularz dopasuje się do etapu, na którym już jesteś.</p>
+
+        <div class="situ" id="situOptions">
+          <div class="sopt" data-situ="none">
+            <div class="rd"></div>
+            <div><b>Nie mam jeszcze przyłącza do sieci</b><br><small>Działka bez doprowadzonej linii energetycznej.</small></div>
+          </div>
+          <div class="sopt" data-situ="conn">
+            <div class="rd"></div>
+            <div><b>Mam przyłącze, ale brak licznika</b><br><small>Linia doprowadzona, licznik do założenia.</small></div>
+          </div>
+          <div class="sopt" data-situ="meter">
+            <div class="rd"></div>
+            <div><b>Mam licznik, ale prąd nie jest jeszcze aktywny</b><br><small>Licznik założony, brakuje aktywacji lub umowy sprzedaży.</small></div>
+          </div>
+        </div>
+
+        <div id="noConnBlock" class="hidden">
+          <div class="note" style="margin-top:6px;">
+            <span>i</span>
+            <div><b>Musisz najpierw skontaktować się ze swoim OSD.</b> Wniosek o warunki przyłączenia składa się bezpośrednio u operatora sieci właściwego dla Twojej działki. Rozwiń instrukcję dla swojego OSD poniżej — albo zostaw kontakt, a poprowadzimy Cię przez ten etap.</div>
+          </div>
+          <div class="acc" id="osdAcc"></div>
+          <div class="nav-btns">
+            <span></span>
+            <button class="btn ghost" id="toPhoneFromNoConn">Wolę, żeby ktoś mi pomógł — oddzwońcie</button>
+          </div>
+        </div>
+
+        <div class="nav-btns" id="situNav">
+          <span></span>
+          <button class="btn" id="next0" disabled>Dalej</button>
+        </div>
+      </div>
+
+      <!-- STEP 1: OFFER -->
+      <div class="card step hidden" data-step="1">
+        <h3>Krok 1 z 3 — konfigurator oferty</h3>
+        <p class="sub">Wybierz zakres obsługi, jaki ma Cię prowadzić przez formalności.</p>
+
+        <div class="offer-grid" id="offerGrid">
+          <div class="offer" data-offer="1">
+            <div class="rd"></div>
+            <span class="otag">Oferta 1</span>
+            <h4>Podstawowa</h4>
+            <ul><li>Przygotowanie wniosku do OSD</li><li>Kontakt e-mail</li><li>Status zgłoszenia w wiadomościach</li></ul>
+          </div>
+          <div class="offer" data-offer="2">
+            <div class="rd"></div>
+            <span class="otag">Oferta 2</span>
+            <h4>Komfort</h4>
+            <ul><li>Wszystko z pakietu Podstawowa</li><li>Priorytetowy kontakt telefoniczny</li><li>Monitoring statusu SMS</li></ul>
+          </div>
+          <div class="offer" data-offer="3">
+            <div class="rd"></div>
+            <span class="otag">Oferta 3</span>
+            <h4>Ekspres</h4>
+            <ul><li>Wszystko z pakietu Komfort</li><li>Dedykowany opiekun zgłoszenia</li><li>Pomoc w reklamacjach i terminach</li></ul>
+          </div>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="regulamin">
+          <span>Akceptuję regulamin świadczenia usługi i politykę prywatności.</span>
+        </label>
+
+        <div class="nav-btns">
+          <button class="btn line" data-back="0">Wstecz</button>
+          <button class="btn" id="next1" disabled>Dalej</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: CLIENT DATA -->
+      <div class="card step hidden" data-step="2">
+        <h3>Krok 2 z 3 — dane klienta</h3>
+        <p class="sub">Dane potrzebne do przygotowania wniosku i umowy.</p>
+
+        <div class="row2">
+          <div class="field"><label for="cImie">Imię</label><input type="text" id="cImie"></div>
+          <div class="field"><label for="cNazwisko">Nazwisko</label><input type="text" id="cNazwisko"></div>
+        </div>
+        <div class="field"><label for="cPesel">PESEL</label><input type="text" id="cPesel" maxlength="11" inputmode="numeric"></div>
+
+        <p class="mono" style="font-size:.7rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint); margin:22px 0 10px;">Adres zamieszkania</p>
+        <div class="row3">
+          <div class="field"><label for="cMiasto">Miejscowość</label><input type="text" id="cMiasto"></div>
+          <div class="field"><label for="cUlica">Ulica</label><input type="text" id="cUlica"></div>
+          <div class="field"><label for="cKod">Kod pocztowy</label><input type="text" id="cKod" placeholder="00-000"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="cBud">Nr budynku</label><input type="text" id="cBud"></div>
+          <div class="field"><label for="cLok">Nr lokalu</label><input type="text" id="cLok"></div>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="innyAdres">
+          <span>Chcę podać inny adres korespondencyjny.</span>
+        </label>
+
+        <div id="korespBlock" class="hidden">
+          <div class="row3">
+            <div class="field"><label for="kMiasto">Miejscowość</label><input type="text" id="kMiasto"></div>
+            <div class="field"><label for="kUlica">Ulica</label><input type="text" id="kUlica"></div>
+            <div class="field"><label for="kKod">Kod pocztowy</label><input type="text" id="kKod" placeholder="00-000"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="kBud">Nr budynku</label><input type="text" id="kBud"></div>
+            <div class="field"><label for="kLok">Nr lokalu</label><input type="text" id="kLok"></div>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field"><label for="cTel">Numer telefonu</label><input type="tel" id="cTel"></div>
+          <div class="field"><label for="cMail">Adres e-mail</label><input type="email" id="cMail"></div>
+        </div>
+
+        <div class="nav-btns">
+          <button class="btn line" data-back="1">Wstecz</button>
+          <button class="btn" id="next2" disabled>Dalej</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: METER DATA -->
+      <div class="card step hidden" data-step="3">
+        <h3>Krok 3 z 3 — dane licznika</h3>
+        <p class="sub">Ostatni etap — dane potrzebne do zgłoszenia w systemie OSD.</p>
+
+        <div class="field">
+          <label for="mPPE">Numer Punktu Poboru Energii (PPE)</label>
+          <input type="text" id="mPPE" placeholder="PL0000000000000000000000000">
+        </div>
+        <label class="check">
+          <input type="checkbox" id="brakPPE">
+          <span>Nie znam / nie mogę znaleźć numeru PPE.</span>
+        </label>
+
+        <div class="field">
+          <label for="mTaryfa">Grupa taryfowa</label>
+          <select id="mTaryfa">
+            <option value="">Wybierz grupę</option>
+            <option>G11 — jedna strefa</option>
+            <option>G12 — dwie strefy (dzień/noc)</option>
+            <option>G12w — strefa weekendowa</option>
+            <option>G13 — pompy ciepła / auta elektryczne</option>
+            <option>Nie wiem — pomóżcie dobrać</option>
+          </select>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="innyLicznik">
+          <span>Adres licznika jest inny niż adres zamieszkania.</span>
+        </label>
+        <div id="licznikAdresBlock" class="hidden">
+          <div class="row3">
+            <div class="field"><label for="lMiasto">Miejscowość</label><input type="text" id="lMiasto"></div>
+            <div class="field"><label for="lUlica">Ulica</label><input type="text" id="lUlica"></div>
+            <div class="field"><label for="lKod">Kod pocztowy</label><input type="text" id="lKod" placeholder="00-000"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="lBud">Nr budynku</label><input type="text" id="lBud"></div>
+            <div class="field"><label for="lLok">Nr lokalu</label><input type="text" id="lLok"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="mZuzycie">Planowane roczne zużycie energii (kWh)</label>
+          <input type="number" id="mZuzycie" placeholder="np. 2500">
+        </div>
+
+        <div class="field">
+          <label>Jaki jest Twój dystrybutor (OSD)?</label>
+          <div class="osd-picker" id="osdPicker">
+            <button type="button" class="osd-btn" data-osd="ENEA">ENEA</button>
+            <button type="button" class="osd-btn" data-osd="ENERGA">ENERGA</button>
+            <button type="button" class="osd-btn" data-osd="Tauron">TAURON</button>
+            <button type="button" class="osd-btn" data-osd="PGE">PGE</button>
+            <button type="button" class="osd-btn" data-osd="Stoen">STOEN</button>
+          </div>
+          <div class="osd-context" id="osdContext"></div>
+        </div>
+
+        <div class="field">
+          <label>Dodaj załączniki (opcjonalnie)</label>
+          <div class="upload" id="uploadBox">
+            <input type="file" id="mFile" style="display:none" multiple>
+            Kliknij, aby dodać zdjęcie licznika, umowy lub faktury
+          </div>
+          <div class="hint" id="fileHint"></div>
+        </div>
+
+        <div class="nav-btns">
+          <button class="btn line" data-back="2">Wstecz</button>
+          <button class="btn" id="next3">Dalej</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: SUMMARY -->
+      <div class="card step hidden" data-step="4">
+        <h3>Podsumowanie</h3>
+        <p class="sub">Sprawdź dane przed wysłaniem zgłoszenia.</p>
+
+        <div class="summary-grid" id="summaryGrid"></div>
+
+        <label class="check"><input type="checkbox" class="finalChk" id="s1"><span>Oświadczam poprawność moich danych.</span></label>
+        <label class="check"><input type="checkbox" class="finalChk" id="s2"><span>Oświadczam, że posiadam prawo do lokalu / działki objętej zgłoszeniem.</span></label>
+        <label class="check"><input type="checkbox" class="finalChk" id="s3"><span>Wyrażam zgodę na kontakt telefoniczny w celu finalizacji zgłoszenia.</span></label>
+
+        <div class="nav-btns">
+          <button class="btn line" data-back="3">Wstecz</button>
+          <button class="btn" id="sendFinal" disabled>Wyślij zgłoszenie</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: DONE -->
+      <div class="card step hidden" data-step="5">
+        <div class="done-box">
+          <div class="done-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 7l9 6 9-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="5" width="18" height="14" rx="1.5" stroke="#fff" stroke-width="2"/></svg>
+          </div>
+          <h3>Zgłoszenie przyjęte</h3>
+          <p>Nasz opiekun zgłoszeń skontaktuje się telefonicznie, aby domknąć formalności i potwierdzić szczegóły z wybranym OSD.</p>
+          <span class="done-ref mono">REF: KOMPAS-<span id="refOnline"></span></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" style="margin-bottom:10px;">OSD<span class="slash">/</span>PILOT</div>
+        <p style="color:var(--ink-soft); font-size:.86rem; max-width:32ch;">Prowadzimy przez formalności przyłączeniowe, montaż licznika i aktywację prądu — niezależnie od operatora sieci.</p>
+      </div>
+      <div>
+        <h4>Usługi</h4>
+        <ul>
+          <li><a href="#s-process">Nowe przyłącze</a></li>
+          <li><a href="#s-meter">Montaż licznika</a></li>
+          <li><a href="#s-form">Zmiana dostawcy</a></li>
+          <li><a href="#s-form">Przepisanie licznika</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Operatorzy</h4>
+        <ul>
+          <li>PGE Dystrybucja</li>
+          <li>Tauron Dystrybucja</li>
+          <li>Enea Operator</li>
+          <li>Energa-Operator</li>
+          <li>Stoen Operator</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul>
+          <li><a href="tel:+48800000000">+48 800 000 000</a></li>
+          <li><a href="#s-form">Zamów oddzwonienie</a></li>
+          <li>pon–pt 8:00–18:00</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>OSD/PILOT — makieta strony, dane przykładowe</span>
+      <span>Regulamin · Polityka prywatności</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var sections = [
+    {id:'s-hero', label:'Start'},
+    {id:'s-process', label:'Proces'},
+    {id:'s-cost', label:'Koszt'},
+    {id:'s-meter', label:'Licznik'},
+    {id:'s-osd', label:'Operatorzy'},
+    {id:'s-form', label:'Formularz'}
+  ];
+  var track = document.querySelector('.rail-track');
+  var fill = document.getElementById('railFill');
+  var dots = [];
+
+  sections.forEach(function(s, i){
+    var d = document.createElement('div');
+    d.className = 'rail-dot';
+    d.style.top = (6 + i * (88/(sections.length-1))) + '%';
+    d.innerHTML = '<span class="rl">'+s.label+'</span>';
+    d.dataset.target = s.id;
+    track.appendChild(d);
+    dots.push(d);
+  });
+
+  function onScroll(){
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY;
+    var max = doc.scrollHeight - window.innerHeight;
+    var frac = max > 0 ? Math.min(1, Math.max(0, scrollTop / max)) : 0;
+    fill.style.height = (frac*100) + '%';
+    var mf = document.getElementById('mprogFill');
+    if(mf) mf.style.width = (frac*100) + '%';
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var dot = dots.find(function(d){ return d.dataset.target === e.target.id; });
+      if(!dot) return;
+      if(e.isIntersecting){
+        dots.forEach(function(d){ d.classList.remove('active'); });
+        dot.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-45% 0px -45% 0px'});
+  sections.forEach(function(s){
+    var el = document.getElementById(s.id);
+    if(el) io.observe(el);
+  });
+
+  var revEls = document.querySelectorAll('.rev');
+  var io2 = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); }
+    });
+  }, {threshold:0.12});
+  revEls.forEach(function(el){ io2.observe(el); });
+})();
+
+/* ---------------- FORM LOGIC ---------------- */
+(function(){
+  var tabPhone = document.getElementById('tabPhone');
+  var tabOnline = document.getElementById('tabOnline');
+  var panelPhone = document.getElementById('panelPhone');
+  var panelOnline = document.getElementById('panelOnline');
+
+  function showTab(which){
+    if(which === 'phone'){
+      tabPhone.classList.add('active'); tabOnline.classList.remove('active');
+      panelPhone.classList.remove('hidden'); panelOnline.classList.add('hidden');
+    } else {
+      tabOnline.classList.add('active'); tabPhone.classList.remove('active');
+      panelOnline.classList.remove('hidden'); panelPhone.classList.add('hidden');
+    }
+  }
+  tabPhone.addEventListener('click', function(){ showTab('phone'); });
+  tabOnline.addEventListener('click', function(){ showTab('online'); });
+
+  document.querySelectorAll('[data-choose]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var choice = btn.dataset.choose;
+      showTab(choice);
+      document.getElementById('s-form').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  /* --- phone form --- */
+  document.getElementById('pSubmit').addEventListener('click', function(){
+    var tel = document.getElementById('pTel').value.trim();
+    if(tel.length < 6){ document.getElementById('pTel').focus(); return; }
+    document.getElementById('cardPhoneForm').classList.add('hidden');
+    document.getElementById('cardPhoneDone').classList.remove('hidden');
+    document.getElementById('refPhone').textContent = Math.floor(1000+Math.random()*8999);
+  });
+
+  /* --- online wizard --- */
+  var state = { situ:null, offer:null, osd:null, files:0 };
+  var step = 0;
+  var steps = document.querySelectorAll('.step');
+  var sdots = document.querySelectorAll('.sdot');
+
+  function goStep(n){
+    step = n;
+    steps.forEach(function(s){ s.classList.toggle('hidden', parseInt(s.dataset.step) !== n); });
+    sdots.forEach(function(d){
+      var i = parseInt(d.dataset.step);
+      d.classList.toggle('now', i === n);
+      d.classList.toggle('done', i < n);
+    });
+    if(n === 4){ buildSummary(); }
+    document.getElementById('s-form').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  document.querySelectorAll('[data-back]').forEach(function(b){
+    b.addEventListener('click', function(){ goStep(parseInt(b.dataset.back)); });
+  });
+
+  /* OSD instructions for "no connection yet" */
+  var osdInstr = [
+    ['PGE', 'Złóż wniosek o określenie warunków przyłączenia (WoP) przez eBOK PGE Dystrybucja lub w Punkcie Obsługi Klienta.'],
+    ['Tauron', 'Wypełnij wniosek o przyłączenie na portalu e-Tauron lub w Punkcie Obsługi Klienta Tauron Dystrybucja.'],
+    ['Enea', 'Złóż wniosek o przyłączenie do sieci przez portal Enea Operator lub listownie do właściwego oddziału.'],
+    ['Energa', 'Skorzystaj z portalu ENERGA-OPERATOR SA lub złóż wniosek papierowo w Biurze Obsługi Klienta.'],
+    ['Stoen', 'Złóż wniosek o przyłączenie w Stoen Operator — obsługa dotyczy wyłącznie lokalizacji na terenie Warszawy.']
+  ];
+  var accWrap = document.getElementById('osdAcc');
+  osdInstr.forEach(function(pair, i){
+    var item = document.createElement('div');
+    item.className = 'acc-item';
+    item.innerHTML = '<button type="button" class="acc-head">'+pair[0]+' <span class="chev">▾</span></button><div class="acc-body">'+pair[1]+'</div>';
+    item.querySelector('.acc-head').addEventListener('click', function(){ item.classList.toggle('open'); });
+    accWrap.appendChild(item);
+  });
+
+  /* situation selection */
+  document.querySelectorAll('.sopt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      document.querySelectorAll('.sopt').forEach(function(o){ o.classList.remove('sel'); });
+      opt.classList.add('sel');
+      state.situ = opt.dataset.situ;
+      var noConn = state.situ === 'none';
+      document.getElementById('noConnBlock').classList.toggle('hidden', !noConn);
+      document.getElementById('situNav').classList.toggle('hidden', noConn);
+      document.getElementById('next0').disabled = noConn ? true : false;
+    });
+  });
+  document.getElementById('toPhoneFromNoConn').addEventListener('click', function(){
+    showTab('phone');
+    document.getElementById('s-form').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+  document.getElementById('next0').addEventListener('click', function(){ goStep(1); });
+
+  /* offer selection */
+  var offerOk = false, regOk = false;
+  function refreshNext1(){ document.getElementById('next1').disabled = !(offerOk && regOk); }
+  document.querySelectorAll('.offer').forEach(function(o){
+    o.addEventListener('click', function(){
+      document.querySelectorAll('.offer').forEach(function(x){ x.classList.remove('sel'); });
+      o.classList.add('sel');
+      state.offer = o.dataset.offer;
+      offerOk = true;
+      refreshNext1();
+    });
+  });
+  document.getElementById('regulamin').addEventListener('change', function(e){
+    regOk = e.target.checked; refreshNext1();
+  });
+  document.getElementById('next1').addEventListener('click', function(){ goStep(2); });
+
+  /* client data */
+  document.getElementById('innyAdres').addEventListener('change', function(e){
+    document.getElementById('korespBlock').classList.toggle('hidden', !e.target.checked);
+  });
+  function checkStep2(){
+    var need = ['cImie','cNazwisko','cPesel','cMiasto','cUlica','cKod','cBud','cTel','cMail'];
+    var ok = need.every(function(id){ return document.getElementById(id).value.trim().length > 0; });
+    document.getElementById('next2').disabled = !ok;
+  }
+  ['cImie','cNazwisko','cPesel','cMiasto','cUlica','cKod','cBud','cTel','cMail'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', checkStep2);
+  });
+  document.getElementById('next2').addEventListener('click', function(){ goStep(3); });
+
+  /* meter data */
+  document.getElementById('innyLicznik').addEventListener('change', function(e){
+    document.getElementById('licznikAdresBlock').classList.toggle('hidden', !e.target.checked);
+  });
+  var osdContext = {
+    ENEA:'ENEA Operator obsługuje część zachodnią i północno-zachodnią Polski. Instalacja licznika trwa zwykle 14–30 dni od podpisania umowy.',
+    ENERGA:'ENERGA-OPERATOR działa na Pomorzu i w regionie kujawsko-pomorskim. Wniosek możesz złożyć również przez ich portal elektroniczny.',
+    Tauron:'TAURON Dystrybucja obejmuje południe Polski, w tym Śląsk i Małopolskę. Dla lokali mieszkalnych stosuje uproszczoną procedurę zgłoszeniową.',
+    PGE:'PGE Dystrybucja to największy operator w Polsce — obejmuje m.in. Polskę centralną i wschodnią. Status wniosku śledzisz online po numerze zgłoszenia.',
+    Stoen:'Stoen Operator obsługuje wyłącznie Warszawę i okolice. W stolicy terminy montażu licznika bywają krótsze dzięki gęstej sieci.'
+  };
+  document.querySelectorAll('.osd-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.osd-btn').forEach(function(x){ x.classList.remove('sel'); });
+      b.classList.add('sel');
+      state.osd = b.dataset.osd;
+      var ctx = document.getElementById('osdContext');
+      ctx.textContent = osdContext[state.osd];
+      ctx.classList.add('show');
+    });
+  });
+  document.getElementById('uploadBox').addEventListener('click', function(){
+    document.getElementById('mFile').click();
+  });
+  document.getElementById('mFile').addEventListener('change', function(e){
+    state.files = e.target.files.length;
+    document.getElementById('fileHint').textContent = state.files ? ('Dodano plików: ' + state.files) : '';
+  });
+  document.getElementById('next3').addEventListener('click', function(){ goStep(4); });
+
+  /* summary */
+  function val(id){ var el = document.getElementById(id); return el ? (el.value || '—') : '—'; }
+  function buildSummary(){
+    var grid = document.getElementById('summaryGrid');
+    var offerNames = {1:'Podstawowa', 2:'Komfort', 3:'Ekspres'};
+    var data = [
+      ['Wybrana oferta', state.offer ? offerNames[state.offer] : '—'],
+      ['Imię i nazwisko', val('cImie') + ' ' + val('cNazwisko')],
+      ['PESEL', val('cPesel')],
+      ['Adres e-mail', val('cMail')],
+      ['Adres zamieszkania', val('cUlica') + ' ' + val('cBud') + (val('cLok')!=='—' ? '/'+val('cLok') : '') + ', ' + val('cKod') + ' ' + val('cMiasto')],
+      ['Numer PPE', document.getElementById('brakPPE').checked ? 'Nieznany — do ustalenia' : val('mPPE')],
+      ['Grupa taryfowa', val('mTaryfa')],
+      ['Planowane zużycie', val('mZuzycie') + ' kWh/rok'],
+      ['Dystrybutor (OSD)', state.osd || '—'],
+      ['Załączniki', state.files ? (state.files + ' plik(ów)') : 'Brak']
+    ];
+    grid.innerHTML = '';
+    data.forEach(function(pair){
+      var d = document.createElement('div');
+      d.className = 'sitem';
+      d.innerHTML = '<b>'+pair[0]+'</b>'+pair[1];
+      grid.appendChild(d);
+    });
+  }
+  document.querySelectorAll('.finalChk').forEach(function(c){
+    c.addEventListener('change', function(){
+      var all = Array.from(document.querySelectorAll('.finalChk')).every(function(x){ return x.checked; });
+      document.getElementById('sendFinal').disabled = !all;
+    });
+  });
+  document.getElementById('sendFinal').addEventListener('click', function(){
+    document.getElementById('refOnline').textContent = Math.floor(1000+Math.random()*8999);
+    goStep(5);
+  });
+
+  goStep(0);
+})();
+</script>
+
+</body>
+</html>
