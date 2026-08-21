@@ -405,7 +405,16 @@ button{font-family:inherit;}
 .calc-detail{margin-top:10px;font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);}
 .calc-note{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-soft);line-height:1.6;max-width:62ch;}
 .cost-cta{margin-top:36px;padding:32px;background:var(--paper-soft);display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;}
-.cost-cta p{font-family:var(--display);font-weight:700;font-size:19px;max-width:34ch;}
+.cost-cta p{font-family:var(--display);font-weight:700;font-size:19px;max-width:64ch;}
+.cost-cta .text-small{
+  display:block;
+  margin-bottom:10px;
+  font-family:var(--body);
+  font-size:14px;
+  font-weight:400;
+  line-height:1.55;
+  color:var(--ink-soft);
+}
 @media (max-width:600px){.calc-box{padding:26px 22px;}}
 
 /* ============ SECTION 03 — DUTY SPLIT & DOCUMENTS ============ */
@@ -454,21 +463,18 @@ button{font-family:inherit;}
   .doc-item{grid-template-columns:32px 1fr;gap:16px;}
 }
 
-/* ============ FAQ (05) ============ */
-.faq-list{margin-top:8px;}
-details.faq{border-top:1px solid var(--line);padding:22px 0;}
-details.faq:last-child{border-bottom:1px solid var(--line);}
-details.faq summary{
-  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:20px;
-}
-details.faq summary::-webkit-details-marker{display:none;}
-.faq-q{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.35;}
-.faq-toggle{
-  font-family:var(--mono);font-size:20px;color:var(--red);flex-shrink:0;width:28px;height:28px;
-  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
-}
-details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(--red);}
-.faq-a{margin-top:16px;font-size:15px;color:var(--ink-soft);line-height:1.6;max-width:62ch;}
+/* ============ SECTION 05 — METER INSTALLATION ============ */
+.mini-steps{list-style:none;margin:28px 0 0;padding:0;}
+.mini-step{display:grid;grid-template-columns:44px 1fr;gap:20px;padding:22px 0;border-top:1px solid var(--line);}
+.mini-step:last-child{border-bottom:1px solid var(--line);}
+.mini-step-num{font-family:var(--mono);font-size:13px;color:var(--red);padding-top:2px;}
+.mini-step p{font-size:15px;color:var(--ink-soft);line-height:1.6;max-width:62ch;}
+.checklist{list-style:none;margin:24px 0 0;padding:0;}
+.checklist li{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--line);}
+.checklist li:last-child{border-bottom:1px solid var(--line);}
+.checklist .chk-icon{width:18px;height:18px;color:var(--red);flex-shrink:0;margin-top:3px;}
+.checklist .chk-icon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.checklist p{font-size:15px;color:var(--ink-soft);line-height:1.55;}
 
 /* ============ CTA / FORM (06) ============ */
 .lead-form{margin-top:8px;display:flex;flex-direction:column;gap:20px;max-width:640px;}
@@ -551,6 +557,17 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
   <symbol id="i-bolt" viewBox="0 0 24 24">
     <polygon points="13 2 4 14 11 14 10 22 20 10 13 10 13 2"/>
   </symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24">
+    <rect x="5" y="4" width="14" height="17" rx="1"/>
+    <rect x="9" y="2" width="6" height="4" rx="1"/>
+    <polyline points="8.5 12.5 11 15 16 9.5"/>
+  </symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24">
+    <rect x="7" y="9" width="10" height="8" rx="2"/>
+    <line x1="10" y1="9" x2="10" y2="4"/>
+    <line x1="14" y1="9" x2="14" y2="4"/>
+    <line x1="12" y1="17" x2="12" y2="21"/>
+  </symbol>
   <symbol id="i-check" viewBox="0 0 24 24">
     <polyline points="3 12 9 18 21 6"/>
   </symbol>
@@ -573,7 +590,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
         <a href="#sytuacja">Twoje sprawy</a>
         <a href="#proces">Jak to działa</a>
         <a href="#koszty">Koszty</a>
-        <a href="#faq">Pytania</a>
+        <a href="#licznik">Licznik</a>
       </div>
       <a href="#zgloszenie" class="btn btn--primary">Zgłoś się</a>
     </nav>
@@ -607,15 +624,17 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
     <div class="container grid">
       <div class="trust-item">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg>
-        <p><strong>Niezależnie od dystrybutora</strong>Obsługujemy zgłoszenia w sieciach PGE, Tauron, Enea, Energa i E.ON.</p>
+        <p><strong> 
+Jesteśmy przedsiębiorstwem energetycznym z Finlandii, obecnym w Polsce 20 lat</strong>Największym sprzedawcą energii w krajach skandynawskich. 
+Dajemy energię światu, w którym ludzie, biznes i natura rozwijają się razem – w harmonii i wzajemnym poszanowaniu.</p>
       </div>
       <div class="trust-item">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user"/></svg>
-        <p><strong>Jeden opiekun</strong>Od pierwszego wniosku do podpisania umowy — bez przekazywania sprawy dalej.</p>
+        <p><strong>Współpracujemy ze wszystkimi dystrybutorami</strong>Obsługujemy zgłoszenia w sieciach PGE, Tauron, Enea, Energa i E.ON.</p>
       </div>
       <div class="trust-item">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clock"/></svg>
-        <p><strong>Odpowiedź w 24 godziny</strong>Plan działania i lista dokumentów trafiają do Ciebie następnego dnia roboczego.</p>
+        <p>Nasi konultanci chętnie odpowiedzą na Twoje pytania, przeprowadzą i wyjaśnią <strong>wszystkie kwestie związane z przyłączeniem prądu.</strong></p>
       </div>
     </div>
   </section>
@@ -632,7 +651,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
       <div class="numbered-content">
         <p class="eyebrow">Jaka jest Twoja sytuacja?</p>
         <h2>Wybierz, co chcesz załatwić</h2>
-        <p class="numbered-lede">Każda sprawa to oddzielne procedury i dokumenty.
+        <p class="numbered-lede">Każda sprawa ma swoje proceduryy i wymaga konkretnych dokumentów.
            <!-- Zaczynamy od miejsca w którym się znajdujesz.</p> -->
         <div class="cards" style="margin-top:32px;">
           <a class="card" href="#zgloszenie" data-situation="Nowe przyłącze energetyczne">
@@ -658,7 +677,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
               <span class="card-icon"><svg viewBox="0 0 24 24"><use href="#i-power"/></svg></span>
               <span class="card-arrow" aria-hidden="true">→</span>
             </span>
-            <h3>Aktywacja dostawy prądu</h3>
+            <h3>Aktywacja licznika, dostawa prądu</h3>
             <p>Licznik zamontowany, ale umowa czeka na podpisanie. Pilnujemy aktywacji dostawy energii, żeby prąd popłynął jak najszybciej.</p>
           </a>
         
@@ -882,42 +901,66 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
     </div>
   </section>
 
-  <!-- ============ 05 — FAQ ============ -->
-  <section class="numbered hairline" id="faq">
+  <!-- ============ 05 — ZAŁOŻENIE LICZNIKA ============ -->
+  <section class="numbered hairline" id="licznik">
     <div class="container numbered-inner">
       <div class="rail">
         <span class="rail-dot"></span>
         <span class="rail-number">05</span>
       </div>
       <div class="numbered-content">
-        <p class="eyebrow">Najczęstsze pytania</p>
-        <h2>To pytają nas najczęściej</h2>
+        <p class="eyebrow">Licznik energii</p>
+        <h2>Założenie licznika energii w domu lub mieszkaniu</h2>
+        <p class="numbered-lede">Odbiór kluczy czy początek prac wykończeniowych to powody do radości, ale też moment, w którym musisz zadbać o prąd. Aby płynnie rozpocząć remont lub wprowadzić się, jednym z pierwszych kroków jest założenie docelowego licznika energii.</p>
+        <!-- <p class="numbered-lede" style="margin-top:16px;">W większości mieszkań z rynku pierwotnego deweloper korzystał z tymczasowego przyłącza budowlanego. Po przekazaniu kluczy obowiązek zawarcia umowy i założenia licznika spada na Ciebie. Masz pełne prawo wybrać dowolnego sprzedawcę energii — my pomagamy w całym procesie.</p> -->
 
-        <div class="faq-list">
-          <details class="faq" open>
-            <summary><span class="faq-q">Jak podłączyć prąd do domu?</span><span class="faq-toggle">+</span></summary>
-            <p class="faq-a">Trzeba złożyć wniosek o określenie warunków przyłączenia do dystrybutora właściwego dla działki, podpisać umowę o przyłączenie, wykonać instalację wewnętrzną zgodnie z warunkami, a na koniec zamontować licznik i podpisać umowę sprzedaży energii z wybranym dostawcą. Prowadzimy każdy z tych kroków za Ciebie.</p>
-          </details>
-          <details class="faq">
-            <summary><span class="faq-q">Ile kosztuje przyłącze prądu?</span><span class="faq-toggle">+</span></summary>
-            <p class="faq-a">Opłatę ustala dystrybutor indywidualnie w warunkach przyłączenia — zależy od zamawianej mocy, odległości od sieci i grupy przyłączeniowej. Założenie licznika przy już istniejącym przyłączu zwykle kosztuje mniej niż budowa przyłącza od podstaw.</p>
-          </details>
-          <details class="faq">
-            <summary><span class="faq-q">Jak założyć licznik energii?</span><span class="faq-toggle">+</span></summary>
-            <p class="faq-a">Należy złożyć wniosek o założenie licznika u właściwego dystrybutora (np. PGE lub Tauron), dołączyć dane techniczne instalacji, poczekać na wyznaczony termin montażu, a następnie podpisać umowę sprzedaży energii z wybranym dostawcą.</p>
-          </details>
-          <details class="faq">
-            <summary><span class="faq-q">Jak zmienić dostawcę energii elektrycznej?</span><span class="faq-toggle">+</span></summary>
-            <p class="faq-a">Nowy dostawca może przeprowadzić cały proces w Twoim imieniu — wypowiedzenie starej umowy i podpisanie nowej. Sieć dystrybucyjna i licznik się nie zmieniają, zmienia się wyłącznie sprzedawca energii.</p>
-          </details>
-          <details class="faq">
-            <summary><span class="faq-q">Co, jeśli przejmuję licznik po poprzednim właścicielu?</span><span class="faq-toggle">+</span></summary>
-            <p class="faq-a">Licznik trzeba przepisać na nowego właściciela — zgłoszenie zmiany do dystrybutora i nowa umowa sprzedaży energii, najlepiej ze wskazaniem odczytu licznika w dniu przejęcia nieruchomości.</p>
-          </details>
-          <details class="faq">
-            <summary><span class="faq-q">Jak wygląda ponowne podłączenie prądu?</span><span class="faq-toggle">+</span></summary>
-            <p class="faq-a">Po odcięciu za zaległości lub sezonowej przerwie w użytkowaniu domu trzeba złożyć wniosek o wznowienie dostawy, uregulować ewentualne zaległości i umówić z dystrybutorem termin ponownego podłączenia.</p>
-          </details>
+        <div class="subblock">
+          <!-- <p class="eyebrow eyebrow--sub">Krok po kroku</p> -->
+          <h3>Jak to wygląda krok po kroku</h3>
+          <ol class="mini-steps">
+            <li class="mini-step">
+              <span class="mini-step-num">01</span>
+              <p>Elektryk z uprawnieniami SEP przygotowuje instalację i wystawia protokół odbioru.</p>
+            </li>
+            <li class="mini-step">
+              <span class="mini-step-num">02</span>
+              <p>Składasz wniosek do właściwego OSD wraz z kompletem dokumentów.</p>
+            </li>
+            <li class="mini-step">
+              <span class="mini-step-num">03</span>
+              <p>Ekipa operatora montuje i plombuje licznik — zwykle w kilka do kilkunastu dni.</p>
+            </li>
+            <li class="mini-step">
+              <span class="mini-step-num">04</span>
+              <p>Podpisujesz umowę sprzedaży energii i prąd zaczyna płynąć.</p>
+            </li>
+          </ol>
+        </div>
+
+        <div class="subblock">
+          <p class="eyebrow eyebrow--sub">Wymagane dokumenty</p>
+          <h3>Dokumenty, które będą Ci potrzebne</h3>
+          <ul class="checklist">
+            <li>
+              <span class="chk-icon"><svg viewBox="0 0 24 24"><use href="#i-doc"/></svg></span>
+              <p>Tytuł prawny do lokalu — akt własności lub umowa najmu.</p>
+            </li>
+            <li>
+              <span class="chk-icon"><svg viewBox="0 0 24 24"><use href="#i-clipboard"/></svg></span>
+              <p>Dokumenty od dewelopera — protokół odbioru mieszkania / protokół zdawczo-odbiorczy.</p>
+            </li>
+            <li>
+              <span class="chk-icon"><svg viewBox="0 0 24 24"><use href="#i-plug"/></svg></span>
+              <p>Protokół odbioru instalacji elektrycznej.</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="cost-cta">
+          <p><span class="text-small">W większości mieszkań z rynku pierwotnego deweloper korzystał z tymczasowego przyłącza budowlanego. 
+            Po przekazaniu kluczy obowiązek zawarcia umowy i założenia licznika spada na Ciebie.</span>
+             Masz pełne prawo wybrać dowolnego sprzedawcę energii — my pomagamy w całym procesie.</p>
+          <a href="#zgloszenie" class="btn btn--primary">Załóż licznik z nami</a>
         </div>
       </div>
     </div>
@@ -932,8 +975,9 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
       </div>
       <div class="numbered-content">
         <p class="eyebrow">Zgłoszenie</p>
-        <h2>Zostaw dane — plan działania wraca w 24 godziny</h2>
-        <p class="numbered-lede">Odezwie się do Ciebie jeden opiekun, który poprowadzi całą sprawę. Nie musisz samodzielnie dzwonić do dystrybutora ani szukać właściwego formularza.</p>
+        <h2>Aktywacja licznika, uruchomienie dostawy prądu </h2>
+        <p class="numbered-lede">Odezwie się do Ciebie nasz opiekun, który poprowadzi całą sprawę. 
+          Nie musisz samodzielnie dzwonić do dystrybutora ani szukać właściwego formularza.</p>
 
         <form class="lead-form" id="leadForm">
           <div class="field-row">
@@ -965,7 +1009,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
               <option value="Aktywacja dostawy prądu">Aktywacja dostawy prądu</option>
               <option value="Ponowne podłączenie prądu">Ponowne podłączenie prądu</option>
               <option value="Zmiana dostawcy energii">Zmiana dostawcy energii</option>
-              <option value="Przepisanie licznika na nowego właściciela">Przepisanie licznika na nowego właściciela</option>
+              <!-- <option value="Przepisanie licznika na nowego właściciela">Przepisanie licznika na nowego właściciela</option> -->
               <option value="Nie jestem pewien / pewna">Nie jestem pewien / pewna</option>
             </select>
           </div>
@@ -976,7 +1020,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
           <button type="submit" class="btn btn--primary btn--block">Wyślij zgłoszenie</button>
           <p class="form-status" id="formStatus">Zgłoszenie przyjęte — opiekun skontaktuje się w ciągu 24 godzin.</p>
         </form>
-        <p class="form-note">Formularz to bezpośrednie zgłoszenie do zespołu OBWÓD, nie do dystrybutora ani sprzedawcy energii.</p>
+        <p class="form-note">Formularz to bezpośrednie zgłoszenie do zespołu Fortum - srzedawcy energii, nie do dystrybutora.</p>
       </div>
     </div>
   </section>
@@ -997,7 +1041,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
         <a href="#sytuacja">Twoja sytuacja</a>
         <a href="#proces">Jak to działa</a>
         <a href="#koszty">Koszty</a>
-        <a href="#faq">Pytania</a>
+        <a href="#licznik">Licznik</a>
         <a href="#zgloszenie">Zgłoszenie</a>
       </nav>
     </div>
