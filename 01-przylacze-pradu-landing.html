@@ -354,6 +354,31 @@ button{font-family:inherit;}
 .step-num{font-family:var(--mono);font-size:13px;color:var(--amber);padding-top:4px;}
 .step h4{font-family:var(--display);font-weight:700;font-size:17px;color:var(--paper);margin-bottom:6px;}
 .step p{font-size:14.5px;color:var(--dark-ink-soft);max-width:56ch;line-height:1.55;}
+.process-track{
+  display:flex;gap:0;overflow-x:auto;padding-bottom:10px;margin:36px -4px 0;
+  scroll-snap-type:x proximity;
+}
+.process-track::-webkit-scrollbar{height:5px;}
+.process-track::-webkit-scrollbar-thumb{background:var(--dark-line);}
+.stop{
+  flex:0 0 220px;scroll-snap-align:start;padding:0 18px 0 0;position:relative;
+}
+.stop::before{
+  content:'';position:absolute;top:14px;left:0;right:18px;height:1px;background:var(--dark-line);
+}
+.stop:last-child::before{display:none;}
+.stop-dot{
+  width:14px;height:14px;border-radius:50%;background:var(--dark);border:2px solid var(--dark-ink-soft);
+  margin-bottom:22px;position:relative;z-index:2;
+}
+.stop:nth-child(6) .stop-dot,.stop.final .stop-dot{background:var(--amber);border-color:var(--amber);}
+.stop-num{font-family:var(--mono);font-size:13px;color:var(--amber);letter-spacing:.06em;}
+.stop h3{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.25;color:var(--paper);margin:6px 0 8px;}
+.stop p{font-size:14px;line-height:1.5;color:var(--dark-ink-soft);margin:0;padding-right:8px;}
+@media (max-width:760px){
+  .process-track{margin-top:28px;}
+  .stop{flex-basis:240px;}
+}
 
 /* ============ COSTS (03) ============ */
 .cost-factors{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:8px;}
@@ -521,7 +546,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="container grid">
       <div class="hero-copy">
-        <p class="eyebrow hero-eyebrow">Przyłącza · liczniki · aktywacja prądu</p>
+        <p class="eyebrow hero-eyebrow">Przyłącza · Liczniki · Aktywacja prądu</p>
         <h1>Prąd w Twoim domu <br/> <em>krok po kroku</em>
           <br/> - od wniosku do aktywnego licznika.</h1>
         <p class="hero-sub">Pomagamy w procesie przyłączenia prądu, wyjaśniamy całą procedurę i wspieramy Cię na każdym etapie.</p>
@@ -538,7 +563,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
     <div class="container grid">
       <div class="trust-item">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg>
-        <p><strong>Niezależnie od dystrybutora</strong>Obsługujemy zgłoszenia w sieciach PGE, Tauron, Enea, Energa i Stoen.</p>
+        <p><strong>Niezależnie od dystrybutora</strong>Obsługujemy zgłoszenia w sieciach PGE, Tauron, Enea, Energa i E.ON.</p>
       </div>
       <div class="trust-item">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user"/></svg>
@@ -590,7 +615,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
               <span class="card-arrow" aria-hidden="true">→</span>
             </span>
             <h3>Aktywacja dostawy prądu</h3>
-            <p>Licznik zamontowany, ale umowa czeka na podpisanie. Pilnujemy aktywacji dostawy energii, żeby prąd popłynął bez zwłoki.</p>
+            <p>Licznik zamontowany, ale umowa czeka na podpisanie. Pilnujemy aktywacji dostawy energii, żeby prąd popłynął jak najszybciej.</p>
           </a>
         
           <a class="card card--wide" href="#zgloszenie" data-situation="Przepisanie licznika na nowego właściciela">
@@ -617,27 +642,47 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
       </div>
       <div class="numbered-content">
         <p class="eyebrow">Proces</p>
-        <h2>Cztery kroki od zgłoszenia do włączonego prądu</h2>
-        <!-- <p class="numbered-lede">Ten sam schemat działa dla przyłącza, licznika, aktywacji i zmiany dostawcy — zmieniają się tylko dokumenty w środku.</p>
-        <ol class="steps">
-          <li class="step">
-            <span class="step-num">01</span>
-            <div><h4>Zgłoszenie</h4><p>Wybierasz swoją sytuację i zostawiasz dane kontaktowe. Zajmuje to około dwóch minut.</p></div>
-          </li>
-          <li class="step">
-            <span class="step-num">02</span>
-            <div><h4>Plan działania</h4><p>W ciągu 24 godzin dostajesz listę wymaganych dokumentów i najbliższe realne terminy.</p></div>
-          </li>
-          <li class="step">
-            <span class="step-num">03</span>
-            <div><h4>Formalności z dystrybutorem</h4><p>Składamy wnioski, umawiamy montaż i pilnujemy terminów w PGE, Tauron, Enei, Enerdze lub Stoen.</p></div>
-          </li>
-          <li class="step">
-            <span class="step-num">04</span>
-            <div><h4>Aktywacja</h4><p>Licznik działa, umowa podpisana, a potwierdzenie zostaje w Twoich rękach na piśmie.</p></div>
-          </li>
-        </ol> -->
-        
+        <h2>Jak podłączyć prąd do domu?</h2>
+        <p class="numbered-lede">Pełen proces — od wniosku do OSD po uruchomienie licznika — składa się z sześciu etapów.</p>
+
+        <div class="process-track">
+          <div class="stop">
+            <div class="stop-dot"></div>
+            <div class="stop-num">01</div>
+            <h3>Wniosek o warunki przyłączenia</h3>
+            <p>Składasz wniosek do właściwego OSD — PGE, Tauron, Enea, Energa lub E.ON — dla swojej działki lub budynku.</p>
+          </div>
+          <div class="stop">
+            <div class="stop-dot"></div>
+            <div class="stop-num">02</div>
+            <h3>Umowa przyłączeniowa</h3>
+            <p>OSD wydaje warunki przyłączenia i umowę z opłatą, zależną od mocy i odległości od sieci.</p>
+          </div>
+          <div class="stop">
+            <div class="stop-dot"></div>
+            <div class="stop-num">03</div>
+            <h3>Budowa przyłącza</h3>
+            <p>Wykonawca OSD doprowadza linię energetyczną do granicy działki lub do budynku.</p>
+          </div>
+          <div class="stop">
+            <div class="stop-dot"></div>
+            <div class="stop-num">04</div>
+            <h3>Montaż licznika</h3>
+            <p>Zakładany jest licznik energii i nadawany numer Punktu Poboru Energii (PPE).</p>
+          </div>
+          <div class="stop">
+            <div class="stop-dot"></div>
+            <div class="stop-num">05</div>
+            <h3>Umowa sprzedaży</h3>
+            <p>Podpisujesz umowę z wybranym sprzedawcą energii — dostawcę możesz zmienić w każdej chwili.</p>
+          </div>
+          <div class="stop final">
+            <div class="stop-dot"></div>
+            <div class="stop-num">06</div>
+            <h3>Aktywacja</h3>
+            <p>Dystrybutor uruchamia dostawę energii. Od tego momentu masz w domu działający prąd.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -731,7 +776,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
             <span class="distro-note">Region północnej Polski — odrębny harmonogram montaży i odrębne wzory wniosków o przyłącze.</span>
           </div>
           <div class="distro">
-            <span class="distro-name">Stoen Operator</span>
+            <span class="distro-name">E.ON Operator</span>
             <span class="distro-note">Sieć warszawska — gęsta zabudowa oznacza dodatkowe uzgodnienia przy nowych przyłączach.</span>
           </div>
         </div>
@@ -848,7 +893,7 @@ details.faq[open] .faq-toggle{background:var(--red);color:#fff;border-color:var(
     <div class="footer-top">
       <div>
         <a href="#top" class="wordmark">OBWÓD <small>Formalności energetyczne</small></a>
-        <p class="footer-disclaimer" style="margin-top:18px;">OBWÓD to niezależny serwis wsparcia w formalnościach związanych z przyłączeniem prądu. Nie jesteśmy dystrybutorem energii ani sprzedawcą energii — reprezentujemy interes klienta w kontakcie z PGE, Tauron, Eneą, Energą i Stoen.</p>
+        <p class="footer-disclaimer" style="margin-top:18px;">OBWÓD to niezależny serwis wsparcia w formalnościach związanych z przyłączeniem prądu. Nie jesteśmy dystrybutorem energii ani sprzedawcą energii — reprezentujemy interes klienta w kontakcie z PGE, Tauron, Eneą, Energą i E.ON.</p>
       </div>
       <nav class="footer-links">
         <a href="#sytuacja">Twoja sytuacja</a>
